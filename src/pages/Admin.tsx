@@ -1,7 +1,7 @@
 import { useEffect, useState, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getSupabaseClient } from '@/lib/supabase';
-import { Users, Mail, Heart, MessageSquare, BookOpen, RefreshCw, Rocket, ExternalLink, CheckCircle2, AlertCircle, HandHeart, PenLine, LogOut, Send, Save, Eye, EyeOff, X, Reply } from 'lucide-react';
+import { getSupabaseClient, SUPABASE_URL, SUPABASE_ANON_KEY } from '@/lib/supabase';
+import { Users, Mail, Heart, MessageSquare, BookOpen, RefreshCw, Rocket, ExternalLink, CircleCheck as CheckCircle2, CircleAlert as AlertCircle, HandHeart, PenLine, LogOut, Send, Save, Eye, EyeOff, X, Reply } from 'lucide-react';
 
 const BlogAdmin = lazy(() => import('./admin/BlogAdmin'));
 
@@ -135,12 +135,12 @@ export default function AdminPage() {
     setSending(true);
     setSendResult(null);
     try {
-      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-admin-email`;
+      const apiUrl = `${SUPABASE_URL}/functions/v1/send-admin-email`;
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({
           to: composeTo.trim(),

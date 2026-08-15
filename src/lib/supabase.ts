@@ -1,19 +1,14 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
+export const SUPABASE_URL = 'https://amkjrwahdbuolggozwgd.supabase.co';
+export const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFta2pyd2FoZGJ1b2xnZ296d2dkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYzMzQ3MDksImV4cCI6MjEwMTkxMDcwOX0.7DPwkA6qOZ_X7WCAXW0pMD3y-GO53mWknwBmpYeUggQ';
+
 let supabaseClient: SupabaseClient | null = null;
 
 export function getSupabaseClient() {
-  const url = import.meta.env.VITE_SUPABASE_URL;
-  const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-  if (!url || !anonKey) {
-    throw new Error('Form submissions are temporarily unavailable.');
-  }
-
   if (!supabaseClient) {
-    supabaseClient = createClient(url, anonKey);
+    supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   }
-
   return supabaseClient;
 }
 
@@ -27,12 +22,12 @@ export async function insertFreeSampleLead(data: {
   city_region?: string;
   referral_source?: string;
 }) {
-  const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-free-sample`;
+  const apiUrl = `${SUPABASE_URL}/functions/v1/send-free-sample`;
   const response = await fetch(apiUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
     },
     body: JSON.stringify(data),
   });
