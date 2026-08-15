@@ -1,17 +1,17 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl  = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
 let supabaseClient: SupabaseClient | null = null;
 
 export function getSupabaseClient() {
-  if (!supabaseUrl || !supabaseAnonKey) {
+  const url = import.meta.env.VITE_SUPABASE_URL;
+  const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+  if (!url || !anonKey) {
     throw new Error('Form submissions are temporarily unavailable.');
   }
 
   if (!supabaseClient) {
-    supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+    supabaseClient = createClient(url, anonKey);
   }
 
   return supabaseClient;

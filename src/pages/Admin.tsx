@@ -1,7 +1,7 @@
 import { useEffect, useState, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getSupabaseClient } from '@/lib/supabase';
-import { Users, Mail, Heart, MessageSquare, BookOpen, RefreshCw, Rocket, ExternalLink, CheckCircle2, AlertCircle, HandHeart, PenLine, LogOut, Send, Save, Eye, EyeOff } from 'lucide-react';
+import { Users, Mail, Heart, MessageSquare, BookOpen, RefreshCw, Rocket, ExternalLink, CheckCircle2, AlertCircle, HandHeart, PenLine, LogOut, Send, Save, Eye, EyeOff, X, Reply } from 'lucide-react';
 
 const BlogAdmin = lazy(() => import('./admin/BlogAdmin'));
 
@@ -72,6 +72,97 @@ export default function AdminPage() {
   const [prayers,  setPrayers]  = useState<PrayerRequest[]>([]);
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [donations, setDonations] = useState<Donation[]>([]);
+
+  const [composeOpen,    setComposeOpen]    = useState(false);
+  const [composeTo,      setComposeTo]      = useState('');
+  const [composeSubject, setComposeSubject] = useState('');
+  const [composeBody,    setComposeBody]    = useState('');
+  const [sending,        setSending]        = useState(false);
+  const [sendResult,     setSendResult]     = useState<{ ok: boolean; msg: string } | null>(null);
+
+  function openCompose(to: string, subject = '') {
+    setComposeTo(to);
+    setComposeSubject(subject);
+    setComposeBody('');
+    setSendResult(null);
+    setComposeOpen(true);
+  }
+
+  function buildEmailHtml(body: string): string {
+    return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin:0;padding:0;background-color:#0E2035;font-family:Georgia,'Times New Roman',serif;color:#ffffff;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#0E2035;min-height:100vh;">
+    <tr>
+      <td align="center" style="padding:40px 20px;">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color:#13294a;border:1px solid rgba(228,184,106,0.2);border-radius:16px;overflow:hidden;">
+          <tr>
+            <td align="center" style="padding:40px 40px 24px;background:linear-gradient(180deg,rgba(201,152,58,0.08) 0%,transparent 100%);">
+              <p style="font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#C9983A;font-weight:bold;margin:0 0 12px 0;">In Him Daily</p>
+              <h1 style="font-size:24px;color:#ffffff;margin:0;font-weight:bold;">A Message From In Him Daily</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:0 40px 40px 40px;">
+              <div style="font-size:16px;color:rgba(255,255,255,0.8);line-height:1.7;white-space:pre-wrap;">${body.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding:0 40px 40px 40px;border-top:1px solid rgba(228,184,106,0.2);">
+              <p style="font-size:12px;color:rgba(255,255,255,0.35);line-height:1.5;margin:24px 0 0 0;">
+                In Him Daily — a ministry of Epic True North<br/>
+                <a href="https://inhimdaily.org" style="color:rgba(201,152,58,0.6);text-decoration:none;">inhimdaily.org</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+  }
+
+  async function sendEmail() {
+    if (!composeTo.trim() || !composeSubject.trim() || !composeBody.trim()) {
+      setSendResult({ ok: false, msg: 'Please fill in all fields.' });
+      return;
+    }
+    setSending(true);
+    setSendResult(null);
+    try {
+      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-admin-email`;
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          to: composeTo.trim(),
+          subject: composeSubject.trim(),
+          html: buildEmailHtml(composeBody),
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok || result.error) {
+        throw new Error(result.error ?? `Request failed (${response.status})`);
+      }
+      setSendResult({ ok: true, msg: 'Email sent successfully.' });
+      setTimeout(() => setComposeOpen(false), 2000);
+    } catch (err) {
+      setSendResult({
+        ok: false,
+        msg: err instanceof Error ? err.message : 'Could not send email. Please try again.',
+      });
+    } finally {
+      setSending(false);
+    }
+  }
 
   async function loadAll() {
     setLoading(true);
@@ -269,10 +360,10 @@ export default function AdminPage() {
               {tab === 'leads' && (
                 <table className="w-full text-sm">
                   <thead className="bg-white/5 text-white/50 text-[0.72rem] uppercase tracking-wider">
-                    <tr>{['Name','Email','Source','Status','Date'].map(h => <th key={h} className="px-5 py-3 text-left font-semibold">{h}</th>)}</tr>
+                    <tr>{['Name','Email','Source','Status','Date',''].map(h => <th key={h} className="px-5 py-3 text-left font-semibold">{h}</th>)}</tr>
                   </thead>
                   <tbody className="divide-y divide-white/10">
-                    {leads.length === 0 ? <tr><td colSpan={5} className="px-5 py-10 text-center text-white/40">No leads yet.</td></tr>
+                    {leads.length === 0 ? <tr><td colSpan={6} className="px-5 py-10 text-center text-white/40">No leads yet.</td></tr>
                       : leads.map(r => (
                         <tr key={r.id} className="hover:bg-white/5 transition-colors">
                           <td className="px-5 py-3.5 font-medium text-white">{r.first_name}</td>
@@ -280,6 +371,7 @@ export default function AdminPage() {
                           <td className="px-5 py-3.5 text-white/60 text-[0.8rem]">{r.source.replace('_', ' ')}</td>
                           <td className="px-5 py-3.5"><StatusBadge status={r.status} /></td>
                           <td className="px-5 py-3.5 text-white/60 text-[0.8rem]">{fmt(r.created_at)}</td>
+                          <td className="px-5 py-3.5"><button onClick={() => openCompose(r.email, `Re: Your Free Sample — In Him Daily`)} className="text-gold-300 hover:text-gold-200 transition-colors" aria-label={`Reply to ${r.email}`}><Reply size={15} /></button></td>
                         </tr>
                       ))}
                   </tbody>
@@ -288,16 +380,17 @@ export default function AdminPage() {
               {tab === 'newsletter' && (
                 <table className="w-full text-sm">
                   <thead className="bg-white/5 text-white/50 text-[0.72rem] uppercase tracking-wider">
-                    <tr>{['Name','Email','Status','Subscribed'].map(h => <th key={h} className="px-5 py-3 text-left font-semibold">{h}</th>)}</tr>
+                    <tr>{['Name','Email','Status','Subscribed',''].map(h => <th key={h} className="px-5 py-3 text-left font-semibold">{h}</th>)}</tr>
                   </thead>
                   <tbody className="divide-y divide-white/10">
-                    {subs.length === 0 ? <tr><td colSpan={4} className="px-5 py-10 text-center text-white/40">No subscribers yet.</td></tr>
+                    {subs.length === 0 ? <tr><td colSpan={5} className="px-5 py-10 text-center text-white/40">No subscribers yet.</td></tr>
                       : subs.map(r => (
                         <tr key={r.id} className="hover:bg-white/5 transition-colors">
                           <td className="px-5 py-3.5 font-medium text-white">{r.name}</td>
                           <td className="px-5 py-3.5 text-white/60">{r.email}</td>
                           <td className="px-5 py-3.5"><StatusBadge status={r.status} /></td>
                           <td className="px-5 py-3.5 text-white/60 text-[0.8rem]">{fmt(r.created_at)}</td>
+                          <td className="px-5 py-3.5"><button onClick={() => openCompose(r.email, `Re: In Him Daily Newsletter`)} className="text-gold-300 hover:text-gold-200 transition-colors" aria-label={`Reply to ${r.email}`}><Reply size={15} /></button></td>
                         </tr>
                       ))}
                   </tbody>
@@ -306,16 +399,17 @@ export default function AdminPage() {
               {tab === 'partners' && (
                 <table className="w-full text-sm">
                   <thead className="bg-white/5 text-white/50 text-[0.72rem] uppercase tracking-wider">
-                    <tr>{['Name','Email','Status','Joined'].map(h => <th key={h} className="px-5 py-3 text-left font-semibold">{h}</th>)}</tr>
+                    <tr>{['Name','Email','Status','Joined',''].map(h => <th key={h} className="px-5 py-3 text-left font-semibold">{h}</th>)}</tr>
                   </thead>
                   <tbody className="divide-y divide-white/10">
-                    {partners.length === 0 ? <tr><td colSpan={4} className="px-5 py-10 text-center text-white/40">No prayer partners yet.</td></tr>
+                    {partners.length === 0 ? <tr><td colSpan={5} className="px-5 py-10 text-center text-white/40">No prayer partners yet.</td></tr>
                       : partners.map(r => (
                         <tr key={r.id} className="hover:bg-white/5 transition-colors">
                           <td className="px-5 py-3.5 font-medium text-white">{r.name}</td>
                           <td className="px-5 py-3.5 text-white/60">{r.email}</td>
                           <td className="px-5 py-3.5"><StatusBadge status={r.status} /></td>
                           <td className="px-5 py-3.5 text-white/60 text-[0.8rem]">{fmt(r.created_at)}</td>
+                          <td className="px-5 py-3.5"><button onClick={() => openCompose(r.email, `Re: In Him Daily Prayer Partners`)} className="text-gold-300 hover:text-gold-200 transition-colors" aria-label={`Reply to ${r.email}`}><Reply size={15} /></button></td>
                         </tr>
                       ))}
                   </tbody>
@@ -324,10 +418,10 @@ export default function AdminPage() {
               {tab === 'prayers' && (
                 <table className="w-full text-sm">
                   <thead className="bg-white/5 text-white/50 text-[0.72rem] uppercase tracking-wider">
-                    <tr>{['Name','Email','Request','Status','Date'].map(h => <th key={h} className="px-5 py-3 text-left font-semibold">{h}</th>)}</tr>
+                    <tr>{['Name','Email','Request','Status','Date',''].map(h => <th key={h} className="px-5 py-3 text-left font-semibold">{h}</th>)}</tr>
                   </thead>
                   <tbody className="divide-y divide-white/10">
-                    {prayers.length === 0 ? <tr><td colSpan={5} className="px-5 py-10 text-center text-white/40">No prayer requests yet.</td></tr>
+                    {prayers.length === 0 ? <tr><td colSpan={6} className="px-5 py-10 text-center text-white/40">No prayer requests yet.</td></tr>
                       : prayers.map(r => (
                         <tr key={r.id} className="hover:bg-white/5 transition-colors">
                           <td className="px-5 py-3.5 font-medium text-white whitespace-nowrap">{r.name}</td>
@@ -335,6 +429,7 @@ export default function AdminPage() {
                           <td className="px-5 py-3.5 text-white/60 max-w-xs"><span className="line-clamp-2">{r.request}</span></td>
                           <td className="px-5 py-3.5 whitespace-nowrap"><StatusBadge status={r.status} /></td>
                           <td className="px-5 py-3.5 text-white/60 text-[0.8rem] whitespace-nowrap">{fmt(r.created_at)}</td>
+                          <td className="px-5 py-3.5">{r.email && <button onClick={() => openCompose(r.email!, `Re: Your Prayer Request — In Him Daily`)} className="text-gold-300 hover:text-gold-200 transition-colors" aria-label={`Reply to ${r.email}`}><Reply size={15} /></button>}</td>
                         </tr>
                       ))}
                   </tbody>
@@ -343,10 +438,10 @@ export default function AdminPage() {
               {tab === 'messages' && (
                 <table className="w-full text-sm">
                   <thead className="bg-white/5 text-white/50 text-[0.72rem] uppercase tracking-wider">
-                    <tr>{['Name','Email','Subject','Message','Status','Date'].map(h => <th key={h} className="px-5 py-3 text-left font-semibold">{h}</th>)}</tr>
+                    <tr>{['Name','Email','Subject','Message','Status','Date',''].map(h => <th key={h} className="px-5 py-3 text-left font-semibold">{h}</th>)}</tr>
                   </thead>
                   <tbody className="divide-y divide-white/10">
-                    {messages.length === 0 ? <tr><td colSpan={6} className="px-5 py-10 text-center text-white/40">No messages yet.</td></tr>
+                    {messages.length === 0 ? <tr><td colSpan={7} className="px-5 py-10 text-center text-white/40">No messages yet.</td></tr>
                       : messages.map(r => (
                         <tr key={r.id} className="hover:bg-white/5 transition-colors">
                           <td className="px-5 py-3.5 font-medium text-white whitespace-nowrap">{r.name}</td>
@@ -355,6 +450,7 @@ export default function AdminPage() {
                           <td className="px-5 py-3.5 text-white/60 max-w-xs"><span className="line-clamp-2">{r.message}</span></td>
                           <td className="px-5 py-3.5 whitespace-nowrap"><StatusBadge status={r.status} /></td>
                           <td className="px-5 py-3.5 text-white/60 text-[0.8rem] whitespace-nowrap">{fmt(r.created_at)}</td>
+                          <td className="px-5 py-3.5"><button onClick={() => openCompose(r.email, `Re: ${r.subject}`)} className="text-gold-300 hover:text-gold-200 transition-colors" aria-label={`Reply to ${r.email}`}><Reply size={15} /></button></td>
                         </tr>
                       ))}
                   </tbody>
@@ -363,10 +459,10 @@ export default function AdminPage() {
               {tab === 'donations' && (
                 <table className="w-full text-sm">
                   <thead className="bg-white/5 text-white/50 text-[0.72rem] uppercase tracking-wider">
-                    <tr>{['Name','Email','Amount','Country','City/Region','Date'].map(h => <th key={h} className="px-5 py-3 text-left font-semibold">{h}</th>)}</tr>
+                    <tr>{['Name','Email','Amount','Country','City/Region','Date',''].map(h => <th key={h} className="px-5 py-3 text-left font-semibold">{h}</th>)}</tr>
                   </thead>
                   <tbody className="divide-y divide-white/10">
-                    {donations.length === 0 ? <tr><td colSpan={6} className="px-5 py-10 text-center text-white/40">No donations yet.</td></tr>
+                    {donations.length === 0 ? <tr><td colSpan={7} className="px-5 py-10 text-center text-white/40">No donations yet.</td></tr>
                       : donations.map(r => (
                         <tr key={r.id} className="hover:bg-white/5 transition-colors">
                           <td className="px-5 py-3.5 font-medium text-white whitespace-nowrap">{r.name}</td>
@@ -375,6 +471,7 @@ export default function AdminPage() {
                           <td className="px-5 py-3.5 text-white/60">{r.country ?? '—'}</td>
                           <td className="px-5 py-3.5 text-white/60">{r.city_region ?? '—'}</td>
                           <td className="px-5 py-3.5 text-white/60 text-[0.8rem] whitespace-nowrap">{fmt(r.created_at)}</td>
+                          <td className="px-5 py-3.5"><button onClick={() => openCompose(r.email, `Re: Your Donation — In Him Daily`)} className="text-gold-300 hover:text-gold-200 transition-colors" aria-label={`Reply to ${r.email}`}><Reply size={15} /></button></td>
                         </tr>
                       ))}
                   </tbody>
@@ -496,6 +593,48 @@ export default function AdminPage() {
         <p className="text-center text-white/30 text-xs mt-6">
           In Him Daily Admin · Data secured with Supabase Row Level Security
         </p>
+
+        {composeOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <div className="ih-card rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 sticky top-0 bg-[#13294a] z-10">
+                <div className="flex items-center gap-3">
+                  <Reply size={18} className="text-gold-300" aria-hidden="true" />
+                  <h2 className="font-playfair text-lg font-bold text-white">Compose Email</h2>
+                </div>
+                <button onClick={() => setComposeOpen(false)} className="p-2 rounded-lg text-white/40 hover:text-white/70 hover:bg-white/10 transition-colors" aria-label="Close">
+                  <X size={18} />
+                </button>
+              </div>
+              <div className="p-6 space-y-4">
+                {sendResult && (
+                  <div className={`p-3.5 rounded-xl flex gap-2.5 items-center ${sendResult.ok ? 'bg-green-500/10 border border-green-500/20' : 'bg-red-500/10 border border-red-500/20'}`}>
+                    {sendResult.ok ? <CheckCircle2 size={16} className="text-green-400 shrink-0" /> : <AlertCircle size={16} className="text-red-400 shrink-0" />}
+                    <p className={`text-sm ${sendResult.ok ? 'text-green-300' : 'text-red-300'}`}>{sendResult.msg}</p>
+                  </div>
+                )}
+                <div>
+                  <label htmlFor="compose-to" className="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-1.5">To</label>
+                  <input id="compose-to" type="email" value={composeTo} onChange={(e) => setComposeTo(e.target.value)} className="ih-input w-full px-4 py-3 text-sm" placeholder="recipient@example.com" />
+                </div>
+                <div>
+                  <label htmlFor="compose-subject" className="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-1.5">Subject</label>
+                  <input id="compose-subject" type="text" value={composeSubject} onChange={(e) => setComposeSubject(e.target.value)} className="ih-input w-full px-4 py-3 text-sm" placeholder="Email subject" />
+                </div>
+                <div>
+                  <label htmlFor="compose-body" className="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-1.5">Message</label>
+                  <textarea id="compose-body" value={composeBody} onChange={(e) => setComposeBody(e.target.value)} rows={8} className="ih-input w-full px-4 py-3 text-sm resize-none" placeholder="Type your message here..." />
+                </div>
+                <div className="flex justify-end gap-3 pt-2">
+                  <button onClick={() => setComposeOpen(false)} className="px-5 py-2.5 rounded-xl text-white/60 hover:text-white/90 hover:bg-white/10 text-sm font-medium transition-colors">Cancel</button>
+                  <button onClick={sendEmail} disabled={sending} className="inline-flex items-center gap-2 px-6 py-2.5 bg-gold-500 hover:bg-gold-400 text-[#05070D] text-sm font-semibold rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    {sending ? <><RefreshCw size={15} className="animate-spin" /> Sending...</> : <><Send size={15} /> Send Email</>}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="mt-12 ih-card overflow-hidden">
           <div className="bg-white/5 px-6 py-5 flex items-center gap-3 border-b border-white/10">
