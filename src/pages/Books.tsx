@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useSEO } from '@/hooks/useSEO';
-import BooksNav from './books/BooksNav';
 import Hero from './books/Hero';
 import AgeCards from './books/AgeCards';
 import CollectionCards from './books/CollectionCards';
@@ -13,7 +12,6 @@ import OneMission from './books/OneMission';
 import PricingCards from './books/PricingCards';
 import TestimonialsCarousel from './books/TestimonialsCarousel';
 import FinalCTA from './books/FinalCTA';
-import BooksFooter from './books/BooksFooter';
 
 export default function Books() {
   const { hash } = useLocation();
@@ -35,7 +33,6 @@ export default function Books() {
 
   return (
     <div className="relative min-h-screen text-white">
-      <BooksNav />
       <main>
         <Hero />
         <AgeCards />
@@ -49,7 +46,6 @@ export default function Books() {
         <TestimonialsCarousel />
         <FinalCTA />
       </main>
-      <BooksFooter />
     </div>
   );
 }
