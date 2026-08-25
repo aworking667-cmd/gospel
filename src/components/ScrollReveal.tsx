@@ -1,37 +1,21 @@
-import { useEffect, useRef, ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 
-interface ScrollRevealProps {
-  children: ReactNode;
-  className?: string;
-  delay?: number;
-}
-
-export default function ScrollReveal({ children, className = '', delay = 0 }: ScrollRevealProps) {
+export default function ScrollReveal({ children, className = '', delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
   const ref = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-
     const observer = new IntersectionObserver(
-      ([entry]) => {
+      (entries) => entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          setTimeout(() => {
-            el.classList.add('visible');
-          }, delay);
-          observer.unobserve(el);
+          entry.target.classList.add('animate-in', 'fade-in', 'slide-in-from-bottom-4', 'duration-700');
+          observer.unobserve(entry.target);
         }
-      },
+      }),
       { threshold: 0.1 }
     );
-
     observer.observe(el);
     return () => observer.disconnect();
-  }, [delay]);
-
-  return (
-    <div ref={ref} className={`reveal ${className}`}>
-      {children}
-    </div>
-  );
+  }, []);
+  return <div ref={ref} className={className}>{children}</div>;
 }

@@ -1,9 +1,17 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Calendar, User, ArrowLeft, Tag, PenLine } from 'lucide-react';
-import { getSupabaseClient } from '@/lib/supabase';
+import { Calendar, User, ArrowLeft, Tag, PenLine, MessageSquare, Send, CircleCheck as CheckCircle } from 'lucide-react';
+import { getSupabaseClient, insertBlogComment, fetchApprovedComments } from '@/lib/supabase';
 import { useSEO } from '@/hooks/useSEO';
 import ScrollReveal from '@/components/ScrollReveal';
+
+type Comment = {
+  id: string;
+  author_name: string;
+  content: string;
+  created_at: string;
+  parent_id: string | null;
+};
 
 type BlogPost = {
   id: string;
@@ -23,6 +31,14 @@ export default function BlogPostPage() {
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [commentName, setCommentName] = useState('');
+  const [commentEmail, setCommentEmail] = useState('');
+  const [commentBody, setCommentBody] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [commentSuccess, setCommentSuccess] = useState(false);
+  const [commentError, setCommentError] = useState('');
 
   useSEO({
     title: post ? `${post.title} | In Him Daily Blog` : 'Article | In Him Daily',
@@ -49,6 +65,10 @@ export default function BlogPostPage() {
           setPost(null);
         } else {
           setPost(data as BlogPost);
+          try {
+            const cmts = await fetchApprovedComments((data as BlogPost).id);
+            setComments(cmts);
+          } catch { /* comments optional */ }
         }
       } catch {
         setError('Article could not be loaded. Please try again later.');
@@ -161,6 +181,129 @@ export default function BlogPostPage() {
             <Link to="/blog" className="inline-flex items-center gap-2 px-6 py-3 ih-btn-ghost text-sm">
               <ArrowLeft size={15} aria-hidden="true" /> All articles
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Comments section */}
+      <section className="pb-20" aria-label="Comments">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="ih-card p-6 sm:p-8">
+            <div className="flex items-center gap-2 mb-6">
+              <MessageSquare size={20} className="text-gold-300" />
+              <h2 className="font-playfair text-xl font-bold text-white">
+                Comments{comments.length > 0 && <span className="text-white/40 text-base ml-2">({comments.length})</span>}
+              </h2>
+            </div>
+
+            {commentSuccess ? (
+              <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/20 flex gap-3 items-start mb-6">
+                <CheckCircle size={18} className="text-green-400 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-green-300">Thank you for your comment!</p>
+                  <p className="text-xs text-green-400/70 mt-0.5">It will appear here once approved by our team.</p>
+                </div>
+              </div>
+            ) : (
+              <form
+                className="space-y-4 mb-8"
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (!commentName.trim() || !commentEmail.trim() || !commentBody.trim()) return;
+                  setSubmitting(true);
+                  setCommentError('');
+                  try {
+                    await insertBlogComment({
+                      post_id: post.id,
+                      author_name: commentName.trim(),
+                      author_email: commentEmail.trim(),
+                      content: commentBody.trim(),
+                    });
+                    setCommentSuccess(true);
+                    setCommentName('');
+                    setCommentEmail('');
+                    setCommentBody('');
+                  } catch {
+                    setCommentError('Could not submit comment. Please try again.');
+                  } finally {
+                    setSubmitting(false);
+                  }
+                }}
+              >
+                {commentError && (
+                  <p className="text-sm text-red-300">{commentError}</p>
+                )}
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="comment-name" className="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-1.5">Name</label>
+                    <input
+                      id="comment-name"
+                      type="text"
+                      value={commentName}
+                      onChange={(e) => setCommentName(e.target.value)}
+                      className="ih-input w-full px-4 py-3 text-sm"
+                      placeholder="Your name"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="comment-email" className="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-1.5">Email (not shown)</label>
+                    <input
+                      id="comment-email"
+                      type="email"
+                      value={commentEmail}
+                      onChange={(e) => setCommentEmail(e.target.value)}
+                      className="ih-input w-full px-4 py-3 text-sm"
+                      placeholder="you@example.com"
+                      required
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="comment-body" className="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-1.5">Comment</label>
+                  <textarea
+                    id="comment-body"
+                    value={commentBody}
+                    onChange={(e) => setCommentBody(e.target.value)}
+                    rows={4}
+                    className="ih-input w-full px-4 py-3 text-sm resize-none"
+                    placeholder="Share your thoughts..."
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-gold-500 hover:bg-gold-400 text-ink-900 text-sm font-semibold rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {submitting ? 'Submitting...' : <><Send size={14} /> Post Comment</>}
+                </button>
+                <p className="text-xs text-white/30">Comments are reviewed by our team before appearing publicly.</p>
+              </form>
+            )}
+
+            {comments.length > 0 ? (
+              <div className="space-y-4 pt-6 border-t border-white/10">
+                {comments.map((c) => (
+                  <div key={c.id} className="flex gap-3">
+                    <div className="w-9 h-9 rounded-full bg-gold-500/15 flex items-center justify-center shrink-0">
+                      <span className="text-sm font-bold text-gold-300">{c.author_name.charAt(0).toUpperCase()}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-sm font-semibold text-white">{c.author_name}</span>
+                        <span className="text-xs text-white/30">{fmtDate(c.created_at)}</span>
+                      </div>
+                      <p className="text-sm text-white/70 leading-relaxed whitespace-pre-wrap">{c.content}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-white/30 text-center pt-6 border-t border-white/10">
+                Be the first to share your thoughts.
+              </p>
+            )}
           </div>
         </div>
       </section>

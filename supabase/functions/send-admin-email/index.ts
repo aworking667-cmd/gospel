@@ -22,11 +22,22 @@ async function getResendApiKey(): Promise<string> {
   return data.value;
 }
 
+interface AttachmentMeta {
+  filename: string;
+  url: string;
+  content_type: string;
+  size: number;
+}
+
 interface RequestBody {
   to: string;
   subject: string;
   html: string;
+  text?: string;
   replyTo?: string;
+  attachments?: AttachmentMeta[];
+  in_reply_to?: string;
+  thread_id?: string;
 }
 
 Deno.serve(async (req: Request) => {
@@ -53,19 +64,28 @@ Deno.serve(async (req: Request) => {
       );
     }
 
+    const resendPayload: Record<string, unknown> = {
+      from: FROM_EMAIL,
+      to: [body.to],
+      subject: body.subject,
+      html: body.html,
+      reply_to: body.replyTo ? [body.replyTo] : undefined,
+    };
+
+    if (body.attachments && body.attachments.length > 0) {
+      resendPayload.attachments = body.attachments.map((a) => ({
+        filename: a.filename,
+        path: a.url,
+      }));
+    }
+
     const emailResponse = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${RESEND_API_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        from: FROM_EMAIL,
-        to: [body.to],
-        subject: body.subject,
-        html: body.html,
-        reply_to: body.replyTo ? [body.replyTo] : undefined,
-      }),
+      body: JSON.stringify(resendPayload),
     });
 
     if (!emailResponse.ok) {
@@ -75,6 +95,25 @@ Deno.serve(async (req: Request) => {
         JSON.stringify({ error: message }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
+    }
+
+    // Save outbound email to admin_emails for the inbox trail
+    if (supabaseUrl && supabaseServiceKey) {
+      const supabase = createClient(supabaseUrl, supabaseServiceKey);
+      await supabase.from("admin_emails").insert({
+        direction: "outbound",
+        from_email: FROM_EMAIL,
+        from_name: "In Him Daily",
+        to_email: body.to,
+        subject: body.subject,
+        body_text: body.text ?? null,
+        body_html: body.html,
+        attachments: body.attachments ?? [],
+        status: "sent",
+        in_reply_to: body.in_reply_to ?? null,
+        thread_id: body.thread_id ?? null,
+        source: "admin_compose",
+      });
     }
 
     return new Response(

@@ -1,9 +1,11 @@
 import { useEffect, useState, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getSupabaseClient, SUPABASE_URL, SUPABASE_ANON_KEY } from '@/lib/supabase';
-import { Users, Mail, Heart, MessageSquare, BookOpen, RefreshCw, Rocket, ExternalLink, CircleCheck as CheckCircle2, CircleAlert as AlertCircle, HandHeart, PenLine, LogOut, Send, Save, Eye, EyeOff, X, Reply } from 'lucide-react';
+import { getSupabaseClient, SUPABASE_URL, SUPABASE_ANON_KEY, fetchUnreadEmailCount, fetchPendingCommentsCount, uploadAttachment, type AttachmentMeta } from '@/lib/supabase';
+import { Users, Mail, Heart, MessageSquare, BookOpen, RefreshCw, Rocket, ExternalLink, CircleCheck as CheckCircle2, CircleAlert as AlertCircle, HandHeart, PenLine, LogOut, Send, Save, Eye, EyeOff, X, Reply, Inbox, Paperclip, Plus, Trash2 } from 'lucide-react';
 
 const BlogAdmin = lazy(() => import('./admin/BlogAdmin'));
+const AdminInbox = lazy(() => import('@/components/AdminInbox'));
+const AdminComments = lazy(() => import('@/components/AdminComments'));
 
 type FreeSampleLead = { id: string; first_name: string; email: string; source: string; status: string; created_at: string; };
 type NewsletterSub  = { id: string; name: string; email: string; status: string; created_at: string; };
@@ -12,17 +14,19 @@ type PrayerRequest  = { id: string; name: string; email: string | null; request:
 type ContactMessage = { id: string; name: string; email: string; subject: string; message: string; status: string; country: string | null; city_region: string | null; created_at: string; };
 type Donation = { id: string; name: string; email: string; country: string | null; city_region: string | null; amount: number | null; prayer_request: string | null; message: string | null; status: string; created_at: string; };
 
-type Tab = 'leads' | 'newsletter' | 'partners' | 'prayers' | 'messages' | 'donations' | 'blog' | 'email';
+type Tab = 'inbox' | 'comments' | 'leads' | 'newsletter' | 'partners' | 'prayers' | 'messages' | 'donations' | 'blog' | 'email';
 
-const TABS: { id: Tab; label: string; icon: React.ElementType; color: string; isSettings?: boolean }[] = [
-  { id: 'leads',     label: 'Free Sample Leads',    icon: BookOpen,      color: 'text-gold-300' },
-  { id: 'newsletter',label: 'Newsletter',           icon: Mail,          color: 'text-gold-300' },
-  { id: 'partners',  label: 'Prayer Partners',      icon: Users,         color: 'text-gold-300' },
-  { id: 'prayers',   label: 'Prayer Requests',      icon: Heart,         color: 'text-gold-300' },
-  { id: 'messages',  label: 'Contact Messages',     icon: MessageSquare, color: 'text-gold-300' },
-  { id: 'donations', label: 'Donations',             icon: HandHeart,     color: 'text-gold-300' },
-  { id: 'blog',      label: 'Blog Articles',        icon: PenLine,       color: 'text-gold-300' },
-  { id: 'email',     label: 'Email Settings',       icon: Send,          color: 'text-gold-300', isSettings: true },
+const TABS: { id: Tab; label: string; icon: React.ElementType; color: string; isSettings?: boolean; isNotification?: boolean }[] = [
+  { id: 'inbox',     label: 'Inbox',                icon: Inbox,          color: 'text-gold-300', isNotification: true },
+  { id: 'comments',  label: 'Comments',             icon: MessageSquare,  color: 'text-gold-300', isNotification: true },
+  { id: 'leads',     label: 'Free Sample Leads',    icon: BookOpen,       color: 'text-gold-300' },
+  { id: 'newsletter',label: 'Newsletter',           icon: Mail,           color: 'text-gold-300' },
+  { id: 'partners',  label: 'Prayer Partners',      icon: Users,          color: 'text-gold-300' },
+  { id: 'prayers',   label: 'Prayer Requests',      icon: Heart,          color: 'text-gold-300' },
+  { id: 'messages',  label: 'Contact Messages',     icon: MessageSquare,  color: 'text-gold-300' },
+  { id: 'donations', label: 'Donations',             icon: HandHeart,      color: 'text-gold-300' },
+  { id: 'blog',      label: 'Blog Articles',        icon: PenLine,        color: 'text-gold-300' },
+  { id: 'email',     label: 'Email Settings',       icon: Send,           color: 'text-gold-300', isSettings: true },
 ];
 
 const STATUS_COLORS: Record<string, string> = {
@@ -57,7 +61,7 @@ export default function AdminPage() {
   const [loading,  setLoading]  = useState(true);
   const [loadError, setLoadError] = useState('');
   const [authChecked, setAuthChecked] = useState(false);
-  const [counts,   setCounts]   = useState<Record<Tab, number>>({ leads:0, newsletter:0, partners:0, prayers:0, messages:0, donations:0, blog:0, email:0 });
+  const [counts,   setCounts]   = useState<Record<Tab, number>>({ inbox:0, comments:0, leads:0, newsletter:0, partners:0, prayers:0, messages:0, donations:0, blog:0, email:0 });
 
   const [resendKey,      setResendKey]      = useState('');
   const [resendSaved,    setResendSaved]    = useState(false);
@@ -77,15 +81,46 @@ export default function AdminPage() {
   const [composeTo,      setComposeTo]      = useState('');
   const [composeSubject, setComposeSubject] = useState('');
   const [composeBody,    setComposeBody]    = useState('');
+  const [composeInReplyTo, setComposeInReplyTo] = useState<string | undefined>(undefined);
+  const [composeThreadId, setComposeThreadId] = useState<string | undefined>(undefined);
+  const [attachments,  setAttachments]    = useState<AttachmentMeta[]>([]);
+  const [uploadingFile, setUploadingFile]  = useState(false);
   const [sending,        setSending]        = useState(false);
   const [sendResult,     setSendResult]     = useState<{ ok: boolean; msg: string } | null>(null);
 
-  function openCompose(to: string, subject = '') {
+  function openCompose(to: string, subject = '', inReplyTo?: string, threadId?: string) {
     setComposeTo(to);
     setComposeSubject(subject);
     setComposeBody('');
+    setComposeInReplyTo(inReplyTo);
+    setComposeThreadId(threadId);
+    setAttachments([]);
     setSendResult(null);
     setComposeOpen(true);
+  }
+
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setUploadingFile(true);
+    try {
+      const supabase = getSupabaseClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id ?? 'admin';
+      for (const file of Array.from(files)) {
+        const att = await uploadAttachment(file, userId);
+        setAttachments((prev) => [...prev, att]);
+      }
+    } catch {
+      setSendResult({ ok: false, msg: 'Could not upload file. Please try again.' });
+    } finally {
+      setUploadingFile(false);
+      e.target.value = '';
+    }
+  }
+
+  function removeAttachment(idx: number) {
+    setAttachments((prev) => prev.filter((_, i) => i !== idx));
   }
 
   function buildEmailHtml(body: string): string {
@@ -146,6 +181,10 @@ export default function AdminPage() {
           to: composeTo.trim(),
           subject: composeSubject.trim(),
           html: buildEmailHtml(composeBody),
+          text: composeBody,
+          attachments,
+          in_reply_to: composeInReplyTo,
+          thread_id: composeThreadId,
         }),
       });
       const result = await response.json();
@@ -153,6 +192,7 @@ export default function AdminPage() {
         throw new Error(result.error ?? `Request failed (${response.status})`);
       }
       setSendResult({ ok: true, msg: 'Email sent successfully.' });
+      setAttachments([]);
       setTimeout(() => setComposeOpen(false), 2000);
     } catch (err) {
       setSendResult({
@@ -189,7 +229,10 @@ export default function AdminPage() {
       setPrayers(pr.data ?? []);
       setMessages(m.data ?? []);
       setDonations(d.data ?? []);
+      const [unreadE, pendingC] = await Promise.all([fetchUnreadEmailCount(), fetchPendingCommentsCount()]);
       setCounts({
+        inbox:      unreadE,
+        comments:   pendingC,
         leads:      l.data?.length    ?? 0,
         newsletter: n.data?.length    ?? 0,
         partners:   pp.data?.length   ?? 0,
@@ -273,6 +316,11 @@ export default function AdminPage() {
         setAuthChecked(true);
         loadAll();
         loadResendKey();
+        const pollInterval = setInterval(async () => {
+          const [u, p] = await Promise.all([fetchUnreadEmailCount(), fetchPendingCommentsCount()]);
+          setCounts((prev) => ({ ...prev, inbox: u, comments: p }));
+        }, 30000);
+        return () => clearInterval(pollInterval);
       } catch {
         navigate('/admin/login', { replace: true });
       }
@@ -305,6 +353,12 @@ export default function AdminPage() {
             <h1 className="font-playfair text-3xl font-bold">In Him Daily — Submissions</h1>
           </div>
           <div className="flex items-center gap-3">
+            <button onClick={() => openCompose('')}
+              className="flex items-center gap-2 px-4 py-2 bg-gold-500 hover:bg-gold-400 text-ink-900 rounded-full text-sm font-semibold transition-colors"
+              aria-label="Compose new email">
+              <Plus size={15} aria-hidden="true" />
+              Compose
+            </button>
             <button onClick={loadAll} disabled={loading}
               className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-full text-sm font-medium transition-colors disabled:opacity-50"
               aria-label="Refresh data">
@@ -331,10 +385,15 @@ export default function AdminPage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
           {TABS.map((t) => (
             <button key={t.id} onClick={() => setTab(t.id)}
-              className={`p-5 rounded-2xl border text-left transition-all duration-200 ${
+              className={`p-5 rounded-2xl border text-left transition-all duration-200 relative ${
                 tab === t.id ? 'ih-card border-gold-400/50' : 'ih-card-solid border-white/10 hover:border-gold-400/30'
               }`}>
-              <t.icon size={20} className={tab === t.id ? 'text-gold-300 mb-3' : `${t.color} mb-3`} aria-hidden="true" />
+              <div className="flex items-center justify-between mb-3">
+                <t.icon size={20} className={tab === t.id ? 'text-gold-300' : t.color} aria-hidden="true" />
+                {t.isNotification && counts[t.id] > 0 && (
+                  <span className="px-2 py-0.5 rounded-full bg-gold-500 text-ink-900 text-[0.65rem] font-bold">{counts[t.id]}</span>
+                )}
+              </div>
               <p className={`text-2xl font-bold font-playfair ${tab === t.id ? 'text-white' : 'text-white'}`}>
                 {loading ? '—' : t.isSettings
                   ? (resendStatus === 'configured'
@@ -342,7 +401,9 @@ export default function AdminPage() {
                     : resendStatus === 'not_configured'
                       ? <AlertCircle size={22} className="text-amber-400" aria-label="Not configured" />
                       : '—')
-                  : counts[t.id]}
+                  : t.isNotification
+                    ? (counts[t.id] > 0 ? counts[t.id] : '0')
+                    : counts[t.id]}
               </p>
               <p className={`text-xs mt-0.5 ${tab === t.id ? 'text-white/60' : 'text-white/45'}`}>{t.label}</p>
             </button>
@@ -350,13 +411,23 @@ export default function AdminPage() {
         </div>
 
         <div className="ih-card overflow-hidden">
-          {loading ? (
+          {loading && tab !== 'inbox' && tab !== 'comments' ? (
             <div className="flex items-center justify-center py-24 text-white/50">
               <RefreshCw size={22} className="animate-spin mr-3" aria-hidden="true" />
               Loading submissions…
             </div>
           ) : (
             <>
+              {tab === 'inbox' && (
+                <Suspense fallback={<div className="flex items-center justify-center py-16 text-white/50"><RefreshCw size={20} className="animate-spin mr-3" /> Loading inbox...</div>}>
+                  <AdminInbox onComposeReply={openCompose} />
+                </Suspense>
+              )}
+              {tab === 'comments' && (
+                <Suspense fallback={<div className="flex items-center justify-center py-16 text-white/50"><RefreshCw size={20} className="animate-spin mr-3" /> Loading comments...</div>}>
+                  <AdminComments />
+                </Suspense>
+              )}
               {tab === 'leads' && (
                 <table className="w-full text-sm">
                   <thead className="bg-white/5 text-white/50 text-[0.72rem] uppercase tracking-wider">
@@ -624,6 +695,28 @@ export default function AdminPage() {
                 <div>
                   <label htmlFor="compose-body" className="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-1.5">Message</label>
                   <textarea id="compose-body" value={composeBody} onChange={(e) => setComposeBody(e.target.value)} rows={8} className="ih-input w-full px-4 py-3 text-sm resize-none" placeholder="Type your message here..." />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-1.5">Attachments</label>
+                  {attachments.length > 0 && (
+                    <div className="space-y-2 mb-2">
+                      {attachments.map((att, idx) => (
+                        <div key={idx} className="flex items-center gap-2 p-2.5 rounded-xl bg-white/5 border border-white/10">
+                          <Paperclip size={14} className="text-gold-300 shrink-0" />
+                          <span className="text-sm text-white/70 truncate flex-1">{att.filename}</span>
+                          <span className="text-xs text-white/30 shrink-0">{att.size < 1024 ? `${att.size} B` : `${(att.size / 1024).toFixed(1)} KB`}</span>
+                          <button onClick={() => removeAttachment(idx)} className="p-1 rounded-lg text-white/40 hover:text-red-300 hover:bg-red-500/10 transition-colors" aria-label="Remove attachment">
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <label className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium text-white/70 cursor-pointer transition-colors">
+                    <Paperclip size={15} />
+                    {uploadingFile ? 'Uploading...' : 'Add file'}
+                    <input type="file" multiple onChange={handleFileUpload} className="hidden" disabled={uploadingFile} />
+                  </label>
                 </div>
                 <div className="flex justify-end gap-3 pt-2">
                   <button onClick={() => setComposeOpen(false)} className="px-5 py-2.5 rounded-xl text-white/60 hover:text-white/90 hover:bg-white/10 text-sm font-medium transition-colors">Cancel</button>

@@ -1,146 +1,68 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 
-const navLinks = [
-  { href: '/',               label: 'Home' },
-  { href: '/about',          label: 'About' },
-  { href: '/devotionals',    label: 'Devotionals' },
-  { href: '/books',          label: 'Books' },
-  { href: '/blog',           label: 'Blog' },
-  { href: '/free-sample',    label: 'Free Sample' },
-  { href: '/prayer-partners',label: 'Prayer Partners' },
-  { href: '/communities',    label: 'Communities' },
-  { href: '/donate',         label: 'Donate' },
-  { href: '/contact',        label: 'Contact' },
+const LINKS = [
+  { to: '/', label: 'Home' },
+  { to: '/devotionals', label: 'Devotionals' },
+  { to: '/books', label: 'Books' },
+  { to: '/blog', label: 'Blog' },
+  { to: '/communities', label: 'Communities' },
+  { to: '/prayer-partners', label: 'Prayer' },
+  { to: '/about', label: 'About' },
+  { to: '/contact', label: 'Contact' },
 ];
 
 export default function Navigation() {
-  const [scrolled, setScrolled]     = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const location                    = useLocation();
-  const pathname                    = location.pathname;
+  const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    const handler = () => setScrolled(window.scrollY > 20);
+    handler();
+    window.addEventListener('scroll', handler);
+    return () => window.removeEventListener('scroll', handler);
   }, []);
 
-  useEffect(() => { setMobileOpen(false); }, [pathname]);
+  useEffect(() => setOpen(false), [location.pathname]);
 
-  useEffect(() => {
-    document.body.style.overflow = mobileOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [mobileOpen]);
+  const isAdmin = location.pathname.startsWith('/admin');
 
   return (
-    <header
-      role="banner"
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-400 ${
-        scrolled ? 'glass-nav py-2 shadow-glass' : 'bg-transparent py-3'
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-14">
-
-          <Link to="/" className="flex items-center gap-3 group shrink-0" aria-label="In Him Daily — home">
-            <div className={`relative flex-shrink-0 transition-all duration-400 ${scrolled ? 'w-11 h-11' : 'w-14 h-14'}`}>
-              <img
-                src="/images/733127106_122096833941384062_9064072413288732878_n.jpg"
-                alt="In Him Daily logo"
-                className="w-full h-full object-contain drop-shadow group-hover:scale-105 transition-transform duration-300"
-              />
-            </div>
-            <div className="hidden sm:block leading-tight">
-              <p className={`font-playfair font-bold transition-all duration-400 ${scrolled ? 'text-white text-base' : 'text-white text-[1.1rem]'}`}>
-                In Him <em className="not-italic text-gold-400">Daily</em>
-              </p>
-              <p className={`text-[0.65rem] tracking-[0.15em] uppercase transition-all duration-400 ${scrolled ? 'text-gold-300/70' : 'text-white/60'}`}>
-                Hidden with Christ in God
-              </p>
-            </div>
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled || open ? 'bg-ink-900/95 backdrop-blur-lg border-b border-white/10' : 'bg-transparent'}`}>
+      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          <Link to="/" className="flex items-center gap-2">
+            <span className="font-playfair text-xl font-bold text-gold-300">In Him Daily</span>
           </Link>
-
-          <nav aria-label="Main navigation" className="hidden lg:flex items-center gap-0.5">
-            {navLinks.map((link) => {
-              const active = pathname === link.href;
-              return (
-                <Link
-                  key={link.href}
-                  to={link.href}
-                  className={`relative px-3.5 py-2 text-[0.82rem] font-medium rounded-lg transition-all duration-200 ${
-                    active
-                      ? 'text-gold-300 bg-white/10'
-                      : 'text-white/80 hover:text-white hover:bg-white/10'
-                  }`}
-                  aria-current={active ? 'page' : undefined}
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
-          </nav>
-
-          <div className="hidden lg:flex">
-            <Link
-              to="/free-sample"
-              className={`px-5 py-2.5 text-[0.82rem] font-semibold rounded-full transition-all duration-300 ${
-                'bg-gold-500 text-[#05070D] hover:bg-gold-400 shadow-gold'
-              } hover:-translate-y-px`}
-            >
-              Get Free Sample
-            </Link>
+          <div className="hidden md:flex items-center gap-1">
+            {LINKS.map((link) => (
+              <Link key={link.to} to={link.to}
+                className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${location.pathname === link.to ? 'text-gold-300' : 'text-white/70 hover:text-white'}`}>
+                {link.label}
+              </Link>
+            ))}
+            <Link to="/free-sample" className="ml-2 px-4 py-2 ih-btn-gold text-sm">Free Sample</Link>
           </div>
-
-          <button
-            className={`lg:hidden p-2 rounded-lg transition-colors text-white hover:bg-white/10`}
-            onClick={() => setMobileOpen((v) => !v)}
-            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={mobileOpen}
-            aria-controls="mobile-menu"
-          >
-            {mobileOpen ? <X size={22} strokeWidth={2} /> : <Menu size={22} strokeWidth={2} />}
+          <button className="md:hidden p-2 text-white/70" onClick={() => setOpen(!open)} aria-label="Toggle menu">
+            {open ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
-      </div>
-
-      <div
-        id="mobile-menu"
-        className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-          mobileOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
-        }`}
-        aria-hidden={!mobileOpen}
-      >
-        <nav
-          aria-label="Mobile navigation"
-          className="glass-nav border-t border-gold-100/20 px-4 pb-5 pt-3 space-y-0.5"
-        >
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              to={link.href}
-              className={`flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-colors ${
-                pathname === link.href
-                  ? 'text-gold-300 bg-white/10 font-semibold'
-                  : 'text-white/70 hover:text-white hover:bg-white/10'
-              }`}
-              aria-current={pathname === link.href ? 'page' : undefined}
-            >
-              {link.label}
-            </Link>
-          ))}
-          <div className="pt-3">
-            <Link
-              to="/free-sample"
-              className="block text-center px-5 py-3 bg-gold-500 text-[#05070D] text-sm font-semibold rounded-full hover:bg-gold-400 transition-colors"
-            >
-              Get Free Sample
-            </Link>
+        {open && (
+          <div className="md:hidden pb-4 space-y-1">
+            {LINKS.map((link) => (
+              <Link key={link.to} to={link.to}
+                className={`block px-4 py-2.5 text-sm font-medium rounded-lg ${location.pathname === link.to ? 'text-gold-300 bg-white/5' : 'text-white/70 hover:text-white hover:bg-white/5'}`}>
+                {link.label}
+              </Link>
+            ))}
+            <Link to="/free-sample" className="block px-4 py-2.5 text-sm font-semibold text-gold-300">Free Sample</Link>
+            <Link to="/donate" className="block px-4 py-2.5 text-sm font-semibold text-gold-300">Donate</Link>
+            {isAdmin && <Link to="/admin" className="block px-4 py-2.5 text-sm font-semibold text-gold-300">Dashboard</Link>}
           </div>
-        </nav>
-      </div>
+        )}
+      </nav>
     </header>
   );
 }
