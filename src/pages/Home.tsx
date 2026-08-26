@@ -147,7 +147,7 @@ export default function HomePage() {
               style={{ width: '1.5px', height: `${42 + i * 5}%`, background: 'linear-gradient(to top, rgba(228,184,106,0.55), transparent)', transform: `translateX(-50%) rotate(${deg}deg)`, animation: `ray-appear ${0.9 + i * 0.12}s ease-out forwards` }} />
           ))}
         </div>
-        {[14,25,38,52,63,75,86,92].map((left, i) => (
+        {[14,25,38,52,63,75].map((left, i) => (
           <div key={i} className="particle absolute w-1 h-1 rounded-full bg-gold-300/40 pointer-events-none" aria-hidden="true"
             style={{ left: `${left}%`, top: `${22 + (i % 3) * 18}%`, animationDelay: `${i * 0.55}s`, animationDuration: `${3.5 + i * 0.6}s` }} />
         ))}
@@ -155,13 +155,13 @@ export default function HomePage() {
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-32 pt-40">
 
           {/* Logo badge */}
-          <div className="flex justify-center mb-8 animate-fade-in">
+          <div className="flex justify-center mb-10 animate-fade-in">
             <div className="relative">
               <div className="absolute inset-0 rounded-full blur-2xl opacity-50" style={{ background: 'radial-gradient(circle, rgba(201,152,58,0.6) 0%, transparent 70%)' }} aria-hidden="true" />
               <img
                 src="/images/733127106_122096833941384062_9064072413288732878_n.jpg"
                 alt="In Him Daily logo"
-                className="relative w-40 h-40 sm:w-48 sm:h-48 rounded-full object-cover border-2 border-gold-400/50 shadow-gold-lg"
+                className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-2 border-gold-400/50 shadow-gold-lg"
                 style={{ boxShadow: '0 0 48px rgba(201,152,58,0.45), 0 0 12px rgba(201,152,58,0.25)' }}
               />
             </div>
@@ -172,12 +172,12 @@ export default function HomePage() {
             <span className="text-gold-200 text-[0.72rem] font-semibold tracking-[0.14em] uppercase">A New Way for Families to Encounter Jesus</span>
           </div>
 
-          <h1 className="font-playfair text-5xl sm:text-6xl md:text-7xl lg:text-[5rem] font-bold text-white leading-[1.08] mb-6">
+          <h1 className="font-playfair text-5xl sm:text-6xl md:text-7xl lg:text-[5rem] font-bold text-white leading-[1.08] mb-8 mt-2">
             Grow Closer to Christ<br />
             <span className="text-gold-gradient">Every Day</span>
           </h1>
 
-          <p className="text-white/70 text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed mb-8">
+          <p className="text-white/70 text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed mb-10">
             Daily devotionals, Bible reflections, prayer resources, and a community of believers.
             Written for <em className="not-italic text-gold-300">adults, teens, and children</em> — so every generation encounters Jesus together.
           </p>

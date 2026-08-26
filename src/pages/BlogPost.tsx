@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Calendar, User, ArrowLeft, Tag, PenLine, MessageSquare, Send, CircleCheck as CheckCircle } from 'lucide-react';
+import { Calendar, User, ArrowLeft, Tag, PenLine, MessageSquare, Send, CircleCheck as CheckCircle, Share2, Copy, Check } from 'lucide-react';
 import { getSupabaseClient, insertBlogComment, fetchApprovedComments } from '@/lib/supabase';
 import { useSEO } from '@/hooks/useSEO';
 import ScrollReveal from '@/components/ScrollReveal';
@@ -26,6 +26,17 @@ type BlogPost = {
   published_at: string | null;
 };
 
+type BlogPostSummary = {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  cover_image_url: string | null;
+  author: string | null;
+  category: string | null;
+  published_at: string | null;
+};
+
 export default function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>();
   const [post, setPost] = useState<BlogPost | null>(null);
@@ -39,6 +50,8 @@ export default function BlogPostPage() {
   const [submitting, setSubmitting] = useState(false);
   const [commentSuccess, setCommentSuccess] = useState(false);
   const [commentError, setCommentError] = useState('');
+  const [relatedPosts, setRelatedPosts] = useState<BlogPostSummary[]>([]);
+  const [copied, setCopied] = useState(false);
 
   useSEO({
     title: post ? `${post.title} | In Him Daily Blog` : 'Article | In Him Daily',
@@ -69,6 +82,18 @@ export default function BlogPostPage() {
             const cmts = await fetchApprovedComments((data as BlogPost).id);
             setComments(cmts);
           } catch { /* comments optional */ }
+          // Fetch related posts (same category, excluding current)
+          try {
+            const supabase2 = getSupabaseClient();
+            const { data: relData } = await supabase2
+              .from('blog_posts')
+              .select('id, title, slug, excerpt, cover_image_url, author, category, published_at')
+              .eq('status', 'published')
+              .neq('id', (data as BlogPost).id)
+              .order('published_at', { ascending: false })
+              .limit(3);
+            setRelatedPosts((relData ?? []) as BlogPostSummary[]);
+          } catch { /* related optional */ }
         }
       } catch {
         setError('Article could not be loaded. Please try again later.');
@@ -176,6 +201,49 @@ export default function BlogPostPage() {
             </div>
           )}
 
+          {/* Share buttons */}
+          <div className="mt-8 pt-8 border-t border-white/10">
+            <div className="flex items-center gap-4">
+              <span className="flex items-center gap-2 text-sm text-white/50 font-medium">
+                <Share2 size={15} aria-hidden="true" /> Share
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(post.title + ' — ' + window.location.href)}`, '_blank')}
+                  aria-label="Share on WhatsApp"
+                  className="w-9 h-9 rounded-full bg-[#25D366]/10 hover:bg-[#25D366]/20 flex items-center justify-center transition-colors"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="text-[#128C7E]" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                </button>
+                <button
+                  onClick={() => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank')}
+                  aria-label="Share on Facebook"
+                  className="w-9 h-9 rounded-full bg-[#1877F2]/15 hover:bg-[#1877F2]/25 flex items-center justify-center transition-colors"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="text-[#1877F2]" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                </button>
+                <button
+                  onClick={() => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title + ' — ' + window.location.href)}`, '_blank')}
+                  aria-label="Share on X"
+                  className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/15 flex items-center justify-center transition-colors"
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="text-white/70" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </button>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(window.location.href);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  aria-label={copied ? 'Link copied' : 'Copy link'}
+                  className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/15 flex items-center justify-center transition-colors"
+                >
+                  {copied ? <Check size={13} className="text-green-400" aria-hidden="true" /> : <Copy size={13} className="text-gold-300" aria-hidden="true" />}
+                </button>
+              </div>
+            </div>
+          </div>
+
           {/* Back link */}
           <div className="mt-12 text-center">
             <Link to="/blog" className="inline-flex items-center gap-2 px-6 py-3 ih-btn-ghost text-sm">
@@ -184,6 +252,62 @@ export default function BlogPostPage() {
           </div>
         </div>
       </section>
+
+      {/* Related articles */}
+      {relatedPosts.length > 0 && (
+        <section className="pb-20" aria-label="Related articles">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="border-t border-white/10 pt-12">
+              <h2 className="font-playfair text-2xl font-bold text-white mb-8 text-center">Continue Reading</h2>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {relatedPosts.map((rp, i) => (
+                  <ScrollReveal key={rp.id} delay={i * 80}>
+                    <Link to={`/blog/${rp.slug}`} className="block group h-full">
+                      <article className="premium-card rounded-2xl overflow-hidden ih-card h-full flex flex-col">
+                        <div className="aspect-[16/10] overflow-hidden bg-white/5">
+                          {rp.cover_image_url ? (
+                            <img
+                              src={rp.cover_image_url}
+                              alt={rp.title}
+                              loading="lazy"
+                              decoding="async"
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <PenLine size={28} className="text-white/20" aria-hidden="true" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-5 flex flex-col flex-1">
+                          {rp.category && (
+                            <span className="text-gold-400 text-[0.68rem] font-semibold tracking-[0.14em] uppercase mb-2">
+                              {rp.category}
+                            </span>
+                          )}
+                          <h3 className="font-playfair text-base font-bold text-white mb-2 leading-snug group-hover:text-gold-200 transition-colors">
+                            {rp.title}
+                          </h3>
+                          {rp.excerpt && (
+                            <p className="text-white/50 text-sm leading-relaxed line-clamp-2 flex-1">
+                              {rp.excerpt}
+                            </p>
+                          )}
+                          {rp.published_at && (
+                            <span className="flex items-center gap-1.5 text-xs text-white/40 mt-3">
+                              <Calendar size={11} aria-hidden="true" /> {fmtDate(rp.published_at)}
+                            </span>
+                          )}
+                        </div>
+                      </article>
+                    </Link>
+                  </ScrollReveal>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Comments section */}
       <section className="pb-20" aria-label="Comments">
