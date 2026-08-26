@@ -47,7 +47,7 @@ export default function App() {
           <Route path="/prayer-partners" element={<PrayerPartners />} />
           <Route path="/prayer-guidelines" element={<PrayerGuidelines />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
-          <Route path="/admin-login" element={<AdminLogin />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
