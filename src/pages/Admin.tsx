@@ -655,6 +655,44 @@ export default function AdminPage() {
                       </li>
                     </ol>
                   </div>
+
+                  <div className="mt-6 p-5 rounded-xl bg-white/[0.03] border border-white/10">
+                    <h3 className="font-playfair text-base font-bold text-white mb-3">Receiving inbound emails</h3>
+                    <p className="text-sm text-white/60 mb-4">
+                      When people reply to your emails, those replies appear in the Inbox tab automatically.
+                      To enable this, point Resend&rsquo;s inbound webhook to the URL below.
+                    </p>
+                    <div className="flex items-center gap-2 p-3 rounded-xl bg-white/5 border border-white/10">
+                      <code className="text-xs text-gold-300 font-mono flex-1 overflow-x-auto whitespace-nowrap">
+                        {SUPABASE_URL}/functions/v1/inbound-email
+                      </code>
+                      <button
+                        onClick={() => navigator.clipboard?.writeText(`${SUPABASE_URL}/functions/v1/inbound-email`)}
+                        className="p-2 rounded-lg text-white/40 hover:text-gold-300 hover:bg-white/10 transition-colors shrink-0"
+                        aria-label="Copy webhook URL"
+                      >
+                        <Plus size={14} className="rotate-45" />
+                      </button>
+                    </div>
+                    <ol className="space-y-2.5 text-sm text-white/60 mt-4">
+                      <li className="flex gap-3">
+                        <span className="w-5 h-5 rounded-full bg-gold-400/20 text-gold-300 text-[0.7rem] font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+                        <span>In Resend, verify your domain (e.g. <code className="text-gold-300 bg-gold-400/10 px-1 rounded text-xs">inhimdaily.org</code>) under Domains.</span>
+                      </li>
+                      <li className="flex gap-3">
+                        <span className="w-5 h-5 rounded-full bg-gold-400/20 text-gold-300 text-[0.7rem] font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+                        <span>Set up an MX or forwarding address on your domain that routes replies to Resend&rsquo;s inbound address (found in Resend &rarr; Webhooks).</span>
+                      </li>
+                      <li className="flex gap-3">
+                        <span className="w-5 h-5 rounded-full bg-gold-400/20 text-gold-300 text-[0.7rem] font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
+                        <span>In Resend &rarr; Webhooks, create a webhook with the URL above, listening for <code className="text-gold-300 bg-gold-400/10 px-1 rounded text-xs">email.received</code> events.</span>
+                      </li>
+                      <li className="flex gap-3">
+                        <span className="w-5 h-5 rounded-full bg-gold-400/20 text-gold-300 text-[0.7rem] font-bold flex items-center justify-center shrink-0 mt-0.5">4</span>
+                        <span>Replies will now appear in the Inbox tab with full message body and attachments.</span>
+                      </li>
+                    </ol>
+                  </div>
                 </div>
               )}
             </>
