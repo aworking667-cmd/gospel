@@ -823,11 +823,11 @@ export default function AdminPage() {
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 flex gap-3 items-start">
-              <AlertCircle size={18} className="text-amber-400 shrink-0 mt-0.5" aria-hidden="true" />
+            <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/20 flex gap-3 items-start">
+              <CheckCircle2 size={18} className="text-green-400 shrink-0 mt-0.5" aria-hidden="true" />
               <div>
-                <p className="text-sm font-medium text-amber-300">Environment variables required</p>
-                <p className="text-xs text-amber-400/70 mt-0.5">VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY must be set in Netlify for forms and dashboard to work in production.</p>
+                <p className="text-sm font-medium text-green-300">Environment variables pre-configured</p>
+                <p className="text-xs text-green-400/70 mt-0.5">Supabase credentials are built in — no environment variables need to be set in Netlify for forms and dashboard to work in production.</p>
               </div>
             </div>
 
