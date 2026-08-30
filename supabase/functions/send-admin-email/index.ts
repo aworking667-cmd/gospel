@@ -8,18 +8,16 @@ const corsHeaders = {
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-const FROM_EMAIL = "In Him Daily <onboarding@resend.dev>";
+const DEFAULT_FROM_EMAIL = "In Him Daily <onboarding@resend.dev>";
 
-async function getResendApiKey(): Promise<string> {
-  if (!supabaseUrl || !supabaseServiceKey) return "";
-  const supabase = createClient(supabaseUrl, supabaseServiceKey);
+async function getConfig(supabase: ReturnType<typeof createClient>, key: string): Promise<string> {
   const { data, error } = await supabase
     .from("app_config")
     .select("value")
-    .eq("key", "RESEND_API_KEY")
+    .eq("key", key)
     .maybeSingle();
   if (error || !data) return "";
-  return data.value;
+  return data.value as string;
 }
 
 interface AttachmentMeta {
@@ -55,7 +53,8 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const RESEND_API_KEY = await getResendApiKey();
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const RESEND_API_KEY = await getConfig(supabase, "RESEND_API_KEY");
 
     if (!RESEND_API_KEY) {
       return new Response(
@@ -63,6 +62,8 @@ Deno.serve(async (req: Request) => {
         { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
+
+    const FROM_EMAIL = (await getConfig(supabase, "RESEND_FROM_EMAIL")) || DEFAULT_FROM_EMAIL;
 
     const resendPayload: Record<string, unknown> = {
       from: FROM_EMAIL,
@@ -99,7 +100,6 @@ Deno.serve(async (req: Request) => {
 
     // Save outbound email to admin_emails for the inbox trail
     if (supabaseUrl && supabaseServiceKey) {
-      const supabase = createClient(supabaseUrl, supabaseServiceKey);
       await supabase.from("admin_emails").insert({
         direction: "outbound",
         from_email: FROM_EMAIL,

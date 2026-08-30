@@ -6,21 +6,19 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
 };
 
-const FROM_EMAIL = "In Him Daily <onboarding@resend.dev>";
+const DEFAULT_FROM_EMAIL = "In Him Daily <onboarding@resend.dev>";
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 
-async function getResendApiKey(): Promise<string> {
-  if (!supabaseUrl || !supabaseServiceKey) return "";
-  const supabase = createClient(supabaseUrl, supabaseServiceKey);
+async function getConfig(supabase: ReturnType<typeof createClient>, key: string): Promise<string> {
   const { data, error } = await supabase
     .from("app_config")
     .select("value")
-    .eq("key", "RESEND_API_KEY")
+    .eq("key", key)
     .maybeSingle();
   if (error || !data) return "";
-  return data.value;
+  return data.value as string;
 }
 
 interface RequestBody {
@@ -191,7 +189,9 @@ Deno.serve(async (req: Request) => {
 
     // Attempt to send the email via Resend — but always return success
     // so the visitor sees confirmation even if the email service is not yet configured.
-    const RESEND_API_KEY = await getResendApiKey();
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const RESEND_API_KEY = await getConfig(supabase, "RESEND_API_KEY");
+    const FROM_EMAIL = (await getConfig(supabase, "RESEND_FROM_EMAIL")) || DEFAULT_FROM_EMAIL;
 
     if (RESEND_API_KEY) {
       try {

@@ -64,6 +64,7 @@ export default function AdminPage() {
   const [counts,   setCounts]   = useState<Record<Tab, number>>({ inbox:0, comments:0, leads:0, newsletter:0, partners:0, prayers:0, messages:0, donations:0, blog:0, email:0 });
 
   const [resendKey,      setResendKey]      = useState('');
+  const [resendFromEmail, setResendFromEmail] = useState('');
   const [resendSaved,    setResendSaved]    = useState(false);
   const [resendSaving,   setResendSaving]   = useState(false);
   const [resendError,   setResendError]    = useState('');
@@ -254,17 +255,20 @@ export default function AdminPage() {
   async function loadResendKey() {
     try {
       const supabase = getSupabaseClient();
-      const { data, error } = await supabase
-        .from('app_config')
-        .select('value')
-        .eq('key', 'RESEND_API_KEY')
-        .maybeSingle();
-      if (error) throw error;
-      if (data?.value) {
-        setResendKey(data.value);
+      const [{ data: keyData }, { data: fromData }] = await Promise.all([
+        supabase.from('app_config').select('value').eq('key', 'RESEND_API_KEY').maybeSingle(),
+        supabase.from('app_config').select('value').eq('key', 'RESEND_FROM_EMAIL').maybeSingle(),
+      ]);
+      if (keyData?.value) {
+        setResendKey(keyData.value);
         setResendStatus('configured');
       } else {
         setResendStatus('not_configured');
+      }
+      if (fromData?.value) {
+        setResendFromEmail(fromData.value);
+      } else {
+        setResendFromEmail('In Him Daily <onboarding@resend.dev>');
       }
     } catch {
       setResendStatus('not_configured');
@@ -277,12 +281,14 @@ export default function AdminPage() {
     setResendSaved(false);
     try {
       const supabase = getSupabaseClient();
-      const { data: existing } = await supabase
+
+      // Save API key
+      const { data: existingKey } = await supabase
         .from('app_config')
         .select('key')
         .eq('key', 'RESEND_API_KEY')
         .maybeSingle();
-      if (existing) {
+      if (existingKey) {
         const { error } = await supabase
           .from('app_config')
           .update({ value: resendKey.trim(), updated_at: new Date().toISOString() })
@@ -294,11 +300,30 @@ export default function AdminPage() {
           .insert({ key: 'RESEND_API_KEY', value: resendKey.trim() });
         if (error) throw error;
       }
+
+      // Save from email
+      const fromVal = resendFromEmail.trim() || 'In Him Daily <onboarding@resend.dev>';
+      const { data: existingFrom } = await supabase
+        .from('app_config')
+        .select('key')
+        .eq('key', 'RESEND_FROM_EMAIL')
+        .maybeSingle();
+      if (existingFrom) {
+        await supabase
+          .from('app_config')
+          .update({ value: fromVal, updated_at: new Date().toISOString() })
+          .eq('key', 'RESEND_FROM_EMAIL');
+      } else {
+        await supabase
+          .from('app_config')
+          .insert({ key: 'RESEND_FROM_EMAIL', value: fromVal });
+      }
+
       setResendSaved(true);
       setResendStatus('configured');
       setTimeout(() => setResendSaved(false), 4000);
     } catch {
-      setResendError('Could not save the API key. Please try again.');
+      setResendError('Could not save the settings. Please try again.');
     } finally {
       setResendSaving(false);
     }
@@ -622,6 +647,24 @@ export default function AdminPage() {
                     </button>
                   </div>
 
+                  <label htmlFor="resend-from" className="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-1.5">
+                    From Email Address
+                  </label>
+                  <div className="relative mb-4">
+                    <input
+                      id="resend-from"
+                      type="text"
+                      value={resendFromEmail}
+                      onChange={(e) => setResendFromEmail(e.target.value)}
+                      placeholder="In Him Daily <noreply@inhimdaily.org>"
+                      className="ih-input w-full px-4 py-3 text-sm"
+                    />
+                  </div>
+                  <p className="text-xs text-white/40 mb-4 -mt-2">
+                    Use <code className="text-gold-300 bg-gold-400/10 px-1 rounded">In Him Daily &lt;onboarding@resend.dev&gt;</code> for testing (only sends to your account email).
+                    To send to anyone, verify your domain at resend.com/domains and use an address on that domain.
+                  </p>
+
                   <button
                     onClick={saveResendKey}
                     disabled={resendSaving || !resendKey.trim()}
@@ -630,7 +673,7 @@ export default function AdminPage() {
                     {resendSaving ? (
                       <><RefreshCw size={15} className="animate-spin" aria-hidden="true" /> Saving...</>
                     ) : (
-                      <><Save size={15} aria-hidden="true" /> Save API Key</>
+                      <><Save size={15} aria-hidden="true" /> Save Settings</>
                     )}
                   </button>
 
