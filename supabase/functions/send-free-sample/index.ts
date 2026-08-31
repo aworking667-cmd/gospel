@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2.58.0";
+import { Resend } from "npm:resend@6.25.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -195,23 +196,16 @@ Deno.serve(async (req: Request) => {
 
     if (RESEND_API_KEY) {
       try {
-        const emailResponse = await fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${RESEND_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            from: FROM_EMAIL,
-            to: [body.email],
-            subject: "Your Free 7-Day Sample — In Him Daily",
-            html: buildEmailHtml(body.first_name),
-          }),
+        const resend = new Resend(RESEND_API_KEY);
+        const { error: sendError } = await resend.emails.send({
+          from: FROM_EMAIL,
+          to: body.email,
+          subject: "Your Free 7-Day Sample — In Him Daily",
+          html: buildEmailHtml(body.first_name),
         });
 
-        if (!emailResponse.ok) {
-          const errorBody = await emailResponse.json().catch(() => null);
-          console.error("Resend API error:", JSON.stringify(errorBody));
+        if (sendError) {
+          console.error("Resend SDK error:", sendError);
         }
       } catch (emailErr) {
         console.error("Email send failed:", emailErr);

@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2.58.0";
+import { Resend } from "npm:resend@6.25.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -65,35 +66,31 @@ Deno.serve(async (req: Request) => {
 
     const FROM_EMAIL = (await getConfig(supabase, "RESEND_FROM_EMAIL")) || DEFAULT_FROM_EMAIL;
 
-    const resendPayload: Record<string, unknown> = {
+    const resend = new Resend(RESEND_API_KEY);
+
+    const emailParams: Parameters<typeof resend.emails.send>[0] = {
       from: FROM_EMAIL,
-      to: [body.to],
+      to: body.to,
       subject: body.subject,
       html: body.html,
-      reply_to: body.replyTo ? [body.replyTo] : undefined,
     };
 
+    if (body.replyTo) {
+      emailParams.reply_to = body.replyTo;
+    }
+
     if (body.attachments && body.attachments.length > 0) {
-      resendPayload.attachments = body.attachments.map((a) => ({
+      emailParams.attachments = body.attachments.map((a) => ({
         filename: a.filename,
         path: a.url,
       }));
     }
 
-    const emailResponse = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${RESEND_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(resendPayload),
-    });
+    const { error: sendError } = await resend.emails.send(emailParams);
 
-    if (!emailResponse.ok) {
-      const errorBody = await emailResponse.json().catch(() => null);
-      const message = errorBody?.message ?? `Email service returned ${emailResponse.status}`;
+    if (sendError) {
       return new Response(
-        JSON.stringify({ error: message }),
+        JSON.stringify({ error: sendError.message ?? "Email service returned an error." }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
