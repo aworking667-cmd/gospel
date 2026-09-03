@@ -3,9 +3,9 @@ import { timeline } from './assets';
 
 export default function ScriptureTimeline() {
   return (
-    <section className="relative py-24 sm:py-32 overflow-hidden">
+    <section className="relative py-16 sm:py-20 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <ScrollReveal className="text-center mb-16">
+        <ScrollReveal className="text-center mb-12">
           <p className="font-cinzel text-gold-300 tracking-[0.25em] text-sm mb-3">SECTION 04</p>
           <h2 className="font-cinzel text-3xl sm:text-5xl font-bold text-white">
             The Journey Through Scripture
@@ -50,7 +50,7 @@ export default function ScriptureTimeline() {
           </div>
         </div>
 
-        <ScrollReveal className="text-center mt-20">
+        <ScrollReveal className="text-center mt-14">
           <p className="font-cinzel text-2xl sm:text-4xl text-white/90 italic">
             Every page whispers His name.
           </p>

@@ -7,21 +7,21 @@ const tipIcons = [BookOpen, Clock, RotateCcw];
 
 export default function HowToUse() {
   return (
-    <section id="how-to-use" className="relative py-24 sm:py-32 scroll-mt-24">
+    <section id="how-to-use" className="relative py-16 sm:py-20 scroll-mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Intro */}
-        <ScrollReveal className="max-w-4xl mx-auto text-center mb-20">
+        <ScrollReveal className="max-w-4xl mx-auto text-center mb-14">
           <p className="font-cinzel text-gold-300 tracking-[0.25em] text-sm mb-3">SECTION 04</p>
           <h2 className="font-cinzel text-3xl sm:text-5xl font-bold text-white mb-8">
             How to Use In Him Daily
           </h2>
 
-          <p className="text-white/70 leading-relaxed mb-6">
+          <p className="text-[#D0D3D8] text-lg leading-[1.6] mb-6">
             There is a way of reading the Bible that changes everything. It is not a technique or a
             study method. It is simply this: knowing who you are looking for before you begin.
           </p>
 
-          <p className="text-white/70 leading-relaxed mb-6">
+          <p className="text-[#D0D3D8] text-lg leading-[1.6] mb-6">
             Jesus said something remarkable to the Pharisees, who were among the most dedicated
             Bible students in history: <span className="italic text-gold-200">“You study the
             Scriptures diligently because you think that in them you have eternal life. These are
@@ -29,7 +29,7 @@ export default function HowToUse() {
             right Book and missing the Person the Book was about.
           </p>
 
-          <p className="text-white/70 leading-relaxed mb-10">
+          <p className="text-[#D0D3D8] text-lg leading-[1.6] mb-10">
             In Him Daily is built on one conviction: every page of Scripture, from Genesis to
             Revelation, was written to reveal Jesus Christ. Not every page in the same way. Not
             forced or artificially read in. But genuinely, purposefully, faithfully present —
@@ -44,12 +44,12 @@ export default function HowToUse() {
             <footer className="mt-4 text-gold-300/80 text-sm tracking-widest">LUKE 24:27</footer>
           </blockquote>
 
-          <p className="text-white/70 leading-relaxed mt-10 mb-2">
+          <p className="text-[#D0D3D8] text-lg leading-[1.6] mt-10 mb-2">
             When the risen Jesus walked the road to Emmaus with two despairing disciples, He did not
             start with the New Testament. He went back to the beginning — Moses, the Prophets, all
             the Scriptures — and showed them how every part was already speaking about Him.
           </p>
-          <p className="text-white/70 leading-relaxed">
+          <p className="text-[#D0D3D8] text-lg leading-[1.6]">
             This series does the same thing: it takes you back through the books of the Bible and
             shows you what Jesus Himself showed those disciples — that He was never absent from any
             page.
@@ -57,8 +57,8 @@ export default function HowToUse() {
         </ScrollReveal>
 
         {/* How each day is structured */}
-        <ScrollReveal className="mb-16">
-          <h3 className="font-cinzel text-2xl sm:text-3xl font-semibold text-white text-center mb-4">
+        <ScrollReveal className="mb-12">
+          <h3 className="font-cinzel text-2xl sm:text-3xl font-bold text-white text-center mb-4">
             How Each Day Is Structured
           </h3>
           <p className="text-white/55 text-center max-w-2xl mx-auto mb-12">
@@ -93,10 +93,10 @@ export default function HowToUse() {
                             MOVEMENT {String(i + 1).padStart(2, '0')}
                           </span>
                         </div>
-                        <h4 className="font-cinzel text-lg font-semibold text-white mb-2">
+                        <h4 className="font-cinzel text-lg font-bold text-white mb-2">
                           {m.title}
                         </h4>
-                        <p className="text-white/60 text-sm leading-relaxed">{m.description}</p>
+                        <p className="text-[#D0D3D8] text-base leading-[1.6]">{m.description}</p>
                       </div>
                     </div>
 
@@ -116,10 +116,10 @@ export default function HowToUse() {
         {/* Three editions in one */}
         <ScrollReveal className="mt-24">
           <div className="rounded-2xl bk-glass p-8 sm:p-12 text-center max-w-4xl mx-auto">
-            <h3 className="font-cinzel text-2xl sm:text-3xl font-semibold text-white mb-5">
+            <h3 className="font-cinzel text-2xl sm:text-3xl font-bold text-white mb-5">
               Three Editions in One
             </h3>
-            <p className="text-white/65 leading-relaxed">
+            <p className="text-[#D0D3D8] text-lg leading-[1.6]">
               Each day is written in three separate editions: <span className="text-gold-200 font-semibold">Adult</span>,{' '}
               <span className="text-gold-200 font-semibold">Teen</span>, and{' '}
               <span className="text-gold-200 font-semibold">Kids</span>. The theological content is
@@ -133,11 +133,11 @@ export default function HowToUse() {
         </ScrollReveal>
 
         {/* How to get the most from this journey */}
-        <ScrollReveal className="mt-24">
-          <h3 className="font-cinzel text-2xl sm:text-3xl font-semibold text-white text-center mb-4">
+        <ScrollReveal className="mt-16">
+          <h3 className="font-cinzel text-2xl sm:text-3xl font-bold text-white text-center mb-4">
             How to Get the Most From This Journey
           </h3>
-          <p className="text-white/55 text-center max-w-2xl mx-auto mb-12">
+          <p className="text-[#D0D3D8]/70 text-center max-w-2xl mx-auto mb-12 text-base">
             Three simple practices that turn reading into encounter.
           </p>
         </ScrollReveal>
@@ -151,10 +151,10 @@ export default function HowToUse() {
                   <div className="w-14 h-14 mb-5 rounded-full flex items-center justify-center bg-gold-400/10 border border-gold-400/30">
                     <Icon className="text-gold-300" size={24} />
                   </div>
-                  <h4 className="font-cinzel text-lg font-semibold text-white mb-3">
+                  <h4 className="font-cinzel text-lg font-bold text-white mb-3">
                     {tip.title}
                   </h4>
-                  <p className="text-white/60 text-sm leading-relaxed">{tip.description}</p>
+                  <p className="text-[#D0D3D8] text-base leading-[1.6]">{tip.description}</p>
                 </div>
               </ScrollReveal>
             );
@@ -162,7 +162,7 @@ export default function HowToUse() {
         </div>
 
         {/* Closing invitation */}
-        <ScrollReveal className="mt-24 text-center max-w-3xl mx-auto">
+        <ScrollReveal className="mt-16 text-center max-w-3xl mx-auto">
           <div className="my-10 flex items-center justify-center">
             <span className="h-px w-24 bg-gradient-to-r from-transparent via-gold-400 to-transparent" />
           </div>

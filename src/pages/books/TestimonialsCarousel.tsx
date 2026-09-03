@@ -6,8 +6,8 @@ export default function TestimonialsCarousel() {
   const loop = [...testimonials, ...testimonials];
 
   return (
-    <section className="relative py-24 sm:py-32 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+    <section className="relative py-16 sm:py-20 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
         <p className="font-cinzel text-gold-300 tracking-[0.25em] text-sm mb-3 text-center">
           TESTIMONIALS
         </p>
@@ -39,7 +39,7 @@ export default function TestimonialsCarousel() {
                     <Star key={s} size={16} className="text-gold-300 fill-gold-300" />
                   ))}
                 </div>
-                <p className="font-cinzel text-lg text-white/90 italic leading-relaxed mb-5">
+                <p className="font-cinzel text-lg text-white/90 italic leading-[1.6] mb-5">
                   &ldquo;{t.quote}&rdquo;
                 </p>
                 <p className="text-gold-300 text-sm tracking-wide">— {t.author}</p>

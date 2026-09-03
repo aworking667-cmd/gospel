@@ -1,4 +1,5 @@
-import { Baby, Sparkles, BookText, Users } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Baby, Sparkles, BookText, Users, ArrowRight } from 'lucide-react';
 import ScrollReveal from '@/components/ScrollReveal';
 import { ageCards } from './assets';
 
@@ -6,14 +7,14 @@ const icons = [Baby, Sparkles, BookText, Users];
 
 export default function AgeCards() {
   return (
-    <section className="relative py-24 sm:py-32">
+    <section className="relative py-16 sm:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <ScrollReveal className="text-center mb-16">
+        <ScrollReveal className="text-center mb-12">
           <p className="font-cinzel text-gold-300 tracking-[0.25em] text-sm mb-3">SECTION 01</p>
           <h2 className="font-cinzel text-3xl sm:text-5xl font-bold text-white">
-            One Message. <span className="text-white/60">Every Age.</span>
+            One Message. <span className="text-[#D0D3D8]">Every Age.</span>
           </h2>
-          <p className="mt-4 text-white/60 max-w-2xl mx-auto">
+          <p className="mt-4 text-lg text-[#D0D3D8] max-w-2xl mx-auto leading-[1.6]">
             Designed for every stage of life — the same unchanging story, told in a voice each
             generation can understand.
           </p>
@@ -24,44 +25,57 @@ export default function AgeCards() {
             const Icon = icons[i] ?? Baby;
             return (
               <ScrollReveal key={card.id} delay={i * 120}>
-                <div className="bk-glass rounded-2xl p-8 h-full group transition-all duration-500 hover:-translate-y-1 hover:border-gold-400/50 hover:shadow-[0_20px_60px_rgba(212,175,55,0.18)]">
+                <Link
+                  to="/books#collections"
+                  className="block rounded-2xl p-8 h-full group transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_60px_rgba(217,166,46,0.18)]"
+                  style={{
+                    background: 'rgba(255,255,255,0.02)',
+                    border: '1px solid #3A3A35',
+                  }}
+                >
                   <div className="flex items-center justify-between mb-6">
                     <div
                       className="w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-500 group-hover:scale-110"
                       style={{
-                        background: 'rgba(212,175,55,0.12)',
-                        boxShadow: '0 0 24px rgba(212,175,55,0.2)',
+                        background: 'rgba(217,166,46,0.12)',
+                        boxShadow: '0 0 24px rgba(217,166,46,0.2)',
                       }}
                     >
                       <Icon className="text-gold-300" size={26} />
                     </div>
-                    <span className="font-cinzel text-xs tracking-[0.2em] text-white/40">
+                    <span className="font-cinzel text-xs tracking-[0.2em] text-[#D0D3D8]/70">
                       {card.range}
                     </span>
                   </div>
 
-                  <h3 className="font-cinzel text-2xl font-semibold text-white mb-5">
+                  <h3 className="font-cinzel text-2xl font-bold text-white mb-1">
                     {card.age}
                   </h3>
+                  <p className="text-sm text-[#D0D3D8]/70 mb-5">{card.range}</p>
 
-                  <ul className="space-y-3">
+                  <ul className="space-y-3 mb-6">
                     {card.features.map((f) => (
-                      <li key={f} className="flex items-center gap-3 text-white/70 text-sm">
+                      <li key={f} className="flex items-center gap-3 text-[#D0D3D8] text-base leading-[1.6]">
                         <span className="w-1.5 h-1.5 rounded-full bg-gold-400 shrink-0" />
                         {f}
                       </li>
                     ))}
                   </ul>
 
-                  <div className="mt-8 relative w-full rounded-xl bg-white/[0.03] border border-white/5 overflow-hidden">
+                  <div className="relative w-full rounded-xl bg-white/[0.03] overflow-hidden" style={{ border: '1px solid #3A3A35' }}>
                     <img
                       src={card.cover}
                       alt={`${card.age} devotional cover`}
                       loading="lazy"
                       className="relative block w-full h-auto object-contain transition-transform duration-500 group-hover:scale-[1.03]"
+                      style={{ filter: 'brightness(1.2) contrast(1.1)', minHeight: '220px' }}
                     />
                   </div>
-                </div>
+
+                  <div className="mt-6 flex items-center gap-2 text-gold-300 font-semibold text-sm group-hover:gap-3 transition-all">
+                    View Books <ArrowRight size={16} />
+                  </div>
+                </Link>
               </ScrollReveal>
             );
           })}

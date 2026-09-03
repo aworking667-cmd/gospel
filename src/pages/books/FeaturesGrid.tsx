@@ -6,9 +6,9 @@ const icons = [Cross, BookOpenCheck, Palette, Users];
 
 export default function FeaturesGrid() {
   return (
-    <section className="relative py-24 sm:py-32">
+    <section className="relative py-16 sm:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <ScrollReveal className="text-center mb-16">
+        <ScrollReveal className="text-center mb-12">
           <p className="font-cinzel text-gold-300 tracking-[0.25em] text-sm mb-3">SECTION 03</p>
           <h2 className="font-cinzel text-3xl sm:text-5xl font-bold text-white">
             Why Families Love IN HIM DAILY
@@ -24,16 +24,16 @@ export default function FeaturesGrid() {
                   <div
                     className="w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-110"
                     style={{
-                      background: 'rgba(212,175,55,0.10)',
-                      boxShadow: '0 0 28px rgba(212,175,55,0.25)',
+                      background: 'rgba(217,166,46,0.10)',
+                      boxShadow: '0 0 28px rgba(217,166,46,0.25)',
                     }}
                   >
                     <Icon className="text-gold-300" size={28} />
                   </div>
-                  <h3 className="font-cinzel text-lg font-semibold text-white mb-3">
+                  <h3 className="font-cinzel text-lg font-bold text-white mb-3">
                     {f.title}
                   </h3>
-                  <p className="text-white/60 text-sm leading-relaxed">{f.description}</p>
+                  <p className="text-[#D0D3D8] text-base leading-[1.6]">{f.description}</p>
                 </div>
               </ScrollReveal>
             );

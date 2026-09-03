@@ -4,7 +4,7 @@ import { checklist } from './assets';
 
 export default function ComparisonSection() {
   return (
-    <section className="relative py-24 sm:py-32">
+    <section className="relative py-16 sm:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           {/* LEFT: artistic illustration */}
@@ -68,7 +68,7 @@ export default function ComparisonSection() {
               <h2 className="font-cinzel text-3xl sm:text-5xl font-bold text-white mb-8">
                 What Makes These Different?
               </h2>
-              <p className="text-white/60 mb-8 leading-relaxed">
+              <p className="text-[#D0D3D8] text-lg mb-8 leading-[1.6]">
                 Every page is crafted to do more than inform — it invites you to encounter the
                 living Christ through His Word.
               </p>
@@ -86,7 +86,7 @@ export default function ComparisonSection() {
                       >
                         <Check className="text-gold-300" size={16} />
                       </span>
-                      <span className="text-white/85 text-lg">{item}</span>
+                      <span className="text-[#D0D3D8] text-lg">{item}</span>
                     </li>
                   </ScrollReveal>
                 ))}

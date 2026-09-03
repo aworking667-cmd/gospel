@@ -4,13 +4,13 @@ import { heroBooks } from './assets';
 
 export default function FinalCTA() {
   return (
-    <section className="relative py-32 sm:py-40 overflow-hidden">
+    <section className="relative py-20 sm:py-24 overflow-hidden">
       {/* slow moving light */}
       <div
         className="absolute inset-0 pointer-events-none bk-cta-light"
         style={{
           background:
-            'radial-gradient(ellipse 70% 60% at 50% 60%, rgba(212,175,55,0.18) 0%, transparent 70%)',
+            'radial-gradient(ellipse 70% 60% at 50% 60%, rgba(217,166,46,0.18) 0%, transparent 70%)',
         }}
         aria-hidden="true"
       />
@@ -23,9 +23,9 @@ export default function FinalCTA() {
         </div>
       </div>
 
-      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-16">
+      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-12">
         {/* three books standing together */}
-        <div className="flex justify-center items-end gap-3 sm:gap-5 mb-12">
+        <div className="flex justify-center items-end gap-3 sm:gap-5 mb-10">
           {heroBooks.map((book, i) => (
             <div
               key={book.id}
@@ -41,7 +41,8 @@ export default function FinalCTA() {
                 src={book.cover}
                 alt={book.title}
                 loading="lazy"
-                className="block w-32 sm:w-48 lg:w-64 h-auto rounded-lg border border-white/10 shadow-2xl bg-black/20"
+                className="block w-32 sm:w-48 lg:w-64 h-auto rounded-lg border border-white/10 shadow-2xl"
+                style={{ filter: 'brightness(1.2) contrast(1.1)' }}
               />
             </div>
           ))}
@@ -51,20 +52,22 @@ export default function FinalCTA() {
           One Bible.
           <br /> Three Versions. <br /> Every Age.
         </h2>
-        <p className="mt-6 font-cinzel text-xl sm:text-2xl text-gold-300">
+        <p className="mt-5 font-cinzel text-xl sm:text-2xl text-gold-300">
           Begin Your Journey Today
         </p>
 
-        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             to="/books#collections"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-full border border-gold-400/40 text-gold-200 font-semibold hover:bg-gold-400/10 hover:border-gold-400/70 transition-all"
+            className="inline-flex items-center gap-2 px-8 rounded-full text-gold-300 font-semibold hover:bg-gold-400/10 transition-all"
+            style={{ border: '1px solid #D9A62E', height: '52px', borderRadius: '26px' }}
           >
             Explore the Collection <ArrowRight size={18} />
           </Link>
           <Link
             to="/books#pricing"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-[#05070D] font-bold bk-shimmer shadow-[0_0_32px_rgba(212,175,55,0.4)] hover:shadow-[0_0_48px_rgba(212,175,55,0.6)] transition-all"
+            className="inline-flex items-center gap-2 px-8 rounded-full text-[#05070D] font-bold hover:brightness-110 transition-all"
+            style={{ backgroundColor: '#D9A62E', height: '52px', borderRadius: '26px' }}
           >
             Shop Now <ShoppingBag size={18} />
           </Link>

@@ -2,13 +2,13 @@ import ScrollReveal from '@/components/ScrollReveal';
 
 export default function OneMission() {
   return (
-    <section className="relative py-32 sm:py-40 overflow-hidden">
+    <section className="relative py-20 sm:py-24 overflow-hidden">
       {/* soft moving light */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(212,175,55,0.12) 0%, transparent 70%)',
+            'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(217,166,46,0.12) 0%, transparent 70%)',
           animation: 'bk-cta-light 14s ease-in-out infinite',
         }}
         aria-hidden="true"
