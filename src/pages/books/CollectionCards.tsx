@@ -3,6 +3,13 @@ import { ArrowUpRight, Clock } from 'lucide-react';
 import ScrollReveal from '@/components/ScrollReveal';
 import { collections } from './assets';
 
+const editionOrder = ['adult', 'teen', 'kids'] as const;
+const editionLabels: Record<string, string> = {
+  adult: 'Adult',
+  teen: 'Teen',
+  kids: 'Kids',
+};
+
 export default function CollectionCards() {
   return (
     <section id="collections" className="relative py-24 sm:py-32 scroll-mt-24">
@@ -22,7 +29,7 @@ export default function CollectionCards() {
           {collections.map((c, i) => (
             <ScrollReveal key={c.id} delay={i * 100}>
               <div className="bk-glass rounded-2xl overflow-hidden h-full group transition-all duration-500 hover:-translate-y-1 hover:border-gold-400/50 hover:shadow-[0_24px_64px_rgba(212,175,55,0.2)]">
-                {/* Book cover — container adapts to the image's natural landscape ratio */}
+                {/* Book cover */}
                 <div className="relative w-full bg-white/[0.03] border-b border-white/5 overflow-hidden">
                   <div
                     className="absolute inset-0"
@@ -54,6 +61,47 @@ export default function CollectionCards() {
                   </div>
 
                   <p className="text-white/60 text-sm leading-relaxed mb-6">{c.description}</p>
+
+                  {/* Per-edition covers + prices */}
+                  <div className="space-y-3 mb-6">
+                    <p className="font-cinzel text-xs tracking-[0.18em] text-gold-300 uppercase">
+                      Available Editions
+                    </p>
+                    {editionOrder.map((key) => {
+                      const ed = c.editions[key];
+                      return (
+                        <div
+                          key={key}
+                          className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2.5"
+                        >
+                          <img
+                            src={ed.cover}
+                            alt={`${c.title} — ${editionLabels[key]} Edition`}
+                            loading="lazy"
+                            className="w-10 h-14 object-contain rounded shrink-0"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-white/85 text-sm font-semibold">
+                              {editionLabels[key]} Edition
+                            </p>
+                            <p className="text-white/45 text-xs">{ed.kes}</p>
+                          </div>
+                          <span className="font-cinzel text-gold-200 font-bold text-sm whitespace-nowrap">
+                            {ed.usd}
+                          </span>
+                        </div>
+                      );
+                    })}
+                    <div className="flex items-center justify-between rounded-lg border border-gold-400/40 bg-gold-400/[0.06] px-3 py-2.5">
+                      <div>
+                        <p className="text-white/90 text-sm font-semibold">Complete Family Bundle</p>
+                        <p className="text-white/45 text-xs">All 3 editions</p>
+                      </div>
+                      <span className="font-cinzel text-gold-200 font-bold text-sm whitespace-nowrap">
+                        $25
+                      </span>
+                    </div>
+                  </div>
 
                   <Link
                     to="/devotionals"

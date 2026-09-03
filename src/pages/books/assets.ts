@@ -40,6 +40,13 @@ export const heroBooks: BookCover[] = [
   },
 ];
 
+export interface EditionPrice {
+  age: 'Kids' | 'Teen' | 'Adult';
+  label: string;
+  usd: string;
+  kes: string;
+}
+
 export interface Collection {
   id: string;
   volume: string;
@@ -48,6 +55,11 @@ export interface Collection {
   days: number;
   description: string;
   cover: string;
+  editions: {
+    kids: { cover: string; usd: string; kes: string };
+    teen: { cover: string; usd: string; kes: string };
+    adult: { cover: string; usd: string; kes: string };
+  };
 }
 
 export const collections: Collection[] = [
@@ -59,6 +71,11 @@ export const collections: Collection[] = [
     days: 120,
     description: 'A 120-day journey tracing the promise of a Saviour from Genesis to Revelation, revealing Christ on every page.',
     cover: '/images/books/he_was_always_the_answer(adult_edition).png',
+    editions: {
+      kids: { cover: '/images/books/he_was_always_the_answer(kids_edition).png', usd: '$8', kes: 'KES 1,080' },
+      teen: { cover: '/images/books/he_was_always_the_answer(teen_edition).png', usd: '$10', kes: 'KES 1,350' },
+      adult: { cover: '/images/books/he_was_always_the_answer(adult_edition).png', usd: '$12', kes: 'KES 1,600' },
+    },
   },
   {
     id: 'torah-1',
@@ -68,6 +85,11 @@ export const collections: Collection[] = [
     days: 100,
     description: 'Walk through the foundations of Scripture and see the Lamb slain before the foundation of the world.',
     cover: '/images/books/in_the_begining_he_was_there(adult_version).png',
+    editions: {
+      kids: { cover: '/images/books/in_the_begining_he_was_there(kids_version).png', usd: '$8', kes: 'KES 1,080' },
+      teen: { cover: '/images/books/in_the_begining_he_was_there(teen_version).png', usd: '$10', kes: 'KES 1,350' },
+      adult: { cover: '/images/books/in_the_begining_he_was_there(adult_version).png', usd: '$12', kes: 'KES 1,600' },
+    },
   },
   {
     id: 'torah-2',
@@ -76,7 +98,12 @@ export const collections: Collection[] = [
     scripture: 'Leviticus & Numbers',
     days: 67,
     description: 'Discover how every sacrifice, feast, and tent peg in the wilderness pointed to the coming Saviour.',
-    cover: '/images/books/in_the_begining_he_was_there(adult_version).png',
+    cover: '/images/books/every_offering_pointed_to_him(adult_version).png',
+    editions: {
+      kids: { cover: '/images/books/every_offering_pointed_to_him(kids_version).png', usd: '$8', kes: 'KES 1,080' },
+      teen: { cover: '/images/books/every_offering_pointed_to_him(teen_version).png', usd: '$10', kes: 'KES 1,350' },
+      adult: { cover: '/images/books/every_offering_pointed_to_him(adult_version).png', usd: '$12', kes: 'KES 1,600' },
+    },
   },
   {
     id: 'psalms',
@@ -86,6 +113,11 @@ export const collections: Collection[] = [
     days: 82,
     description: 'Hear the voice of the Shepherd-King in every psalm, from the cross-shaped cries of David to the praises of Zion.',
     cover: '/images/books/he_sang_about_himself(adult_edition).png',
+    editions: {
+      kids: { cover: '/images/books/he_sang_about_himself(kids_edition).png', usd: '$8', kes: 'KES 1,080' },
+      teen: { cover: '/images/books/he_sang_about_himself(teen_edition).png', usd: '$10', kes: 'KES 1,350' },
+      adult: { cover: '/images/books/he_sang_about_himself(adult_edition).png', usd: '$12', kes: 'KES 1,600' },
+    },
   },
   {
     id: 'nt',
@@ -95,6 +127,11 @@ export const collections: Collection[] = [
     days: 120,
     description: 'See how the Old Testament promises burst into living colour the moment the Word becomes flesh.',
     cover: '/images/books/every_where_i_look_its_him(adult_edition).png',
+    editions: {
+      kids: { cover: '/images/books/everywhere_i_look_its_him(kids_edition).png', usd: '$8', kes: 'KES 1,080' },
+      teen: { cover: '/images/books/everywhere_i_look_its_him(teen_edition).png', usd: '$10', kes: 'KES 1,350' },
+      adult: { cover: '/images/books/every_where_i_look_its_him(adult_edition).png', usd: '$12', kes: 'KES 1,600' },
+    },
   },
   {
     id: 'deut',
@@ -104,6 +141,11 @@ export const collections: Collection[] = [
     days: 120,
     description: 'Listen to the sermons of Moses and hear the heartbeat of the Prophet who would one day stand on the mountain.',
     cover: '/images/books/he_spoke_before_he_came(adult_version).png',
+    editions: {
+      kids: { cover: '/images/books/he_spoke_before_he_came(kids_version).png', usd: '$8', kes: 'KES 1,080' },
+      teen: { cover: '/images/books/he_spoke_before_he_came(teen_version).png', usd: '$10', kes: 'KES 1,350' },
+      adult: { cover: '/images/books/he_spoke_before_he_came(adult_version).png', usd: '$12', kes: 'KES 1,600' },
+    },
   },
 ];
 
