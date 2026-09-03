@@ -43,7 +43,7 @@ export default function CollectionCards() {
                     src={c.cover}
                     alt={c.title}
                     loading="lazy"
-                    className="relative block w-full h-auto object-contain p-5 transition-transform duration-500 group-hover:scale-[1.03]"
+                    className="relative block w-full h-auto object-contain transition-transform duration-500 group-hover:scale-[1.03]"
                   />
                   <span className="bk-sweep" />
                 </div>
@@ -78,7 +78,7 @@ export default function CollectionCards() {
                             src={ed.cover}
                             alt={`${c.title} — ${editionLabels[key]} Edition`}
                             loading="lazy"
-                            className="w-10 h-14 object-contain rounded shrink-0"
+                            className="w-16 h-22 object-contain rounded shrink-0"
                           />
                           <div className="flex-1 min-w-0">
                             <p className="text-white/85 text-sm font-semibold">

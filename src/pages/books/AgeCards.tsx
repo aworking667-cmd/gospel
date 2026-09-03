@@ -58,7 +58,7 @@ export default function AgeCards() {
                       src={card.cover}
                       alt={`${card.age} devotional cover`}
                       loading="lazy"
-                      className="relative block w-full h-auto object-contain p-4 transition-transform duration-500 group-hover:scale-[1.03]"
+                      className="relative block w-full h-auto object-contain transition-transform duration-500 group-hover:scale-[1.03]"
                     />
                   </div>
                 </div>
