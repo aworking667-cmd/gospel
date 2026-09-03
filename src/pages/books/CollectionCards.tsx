@@ -32,15 +32,27 @@ export default function CollectionCards() {
                 className="rounded-2xl overflow-hidden h-full group transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_24px_64px_rgba(217,166,46,0.2)]"
                 style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid #3A3A35' }}
               >
-                {/* Book cover */}
+                {/* Three full edition covers side by side */}
                 <div className="relative w-full bg-white/[0.03] border-b border-white/5 overflow-hidden">
-                  <img
-                    src={c.cover}
-                    alt={c.title}
-                    loading="lazy"
-                    className="relative block w-full h-auto object-contain transition-transform duration-500 group-hover:scale-[1.03]"
-                    style={{ filter: 'brightness(1.2) contrast(1.1)' }}
-                  />
+                  <div className="flex items-stretch justify-center gap-2 sm:gap-3 p-4">
+                    {editionOrder.map((key) => {
+                      const ed = c.editions[key];
+                      return (
+                        <div key={key} className="flex-1 max-w-[33%]">
+                          <img
+                            src={ed.cover}
+                            alt={`${c.title} — ${editionLabels[key]} Edition`}
+                            loading="lazy"
+                            className="block w-full h-auto object-contain transition-transform duration-500 group-hover:scale-[1.03]"
+                            style={{ filter: 'brightness(1.2) contrast(1.1)' }}
+                          />
+                          <p className="text-center text-[#D0D3D8] text-xs font-semibold mt-2">
+                            {editionLabels[key]}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 <div className="p-6">
@@ -57,7 +69,7 @@ export default function CollectionCards() {
 
                   <p className="text-[#D0D3D8] text-base leading-[1.6] mb-6">{c.description}</p>
 
-                  {/* Per-edition covers + prices */}
+                  {/* Per-edition prices */}
                   <div className="space-y-3 mb-6">
                     <p className="font-cinzel text-xs tracking-[0.18em] text-gold-300 uppercase">
                       Available Editions
@@ -67,30 +79,21 @@ export default function CollectionCards() {
                       return (
                         <div
                           key={key}
-                          className="flex items-center gap-3 rounded-lg px-3 py-3"
+                          className="flex items-center justify-between rounded-lg px-4 py-3"
                           style={{ border: '1px solid #3A3A35', background: 'rgba(255,255,255,0.02)' }}
                         >
-                          <img
-                            src={ed.cover}
-                            alt={`${c.title} — ${editionLabels[key]} Edition`}
-                            loading="lazy"
-                            className="w-16 h-22 object-contain rounded shrink-0"
-                            style={{ filter: 'brightness(1.2) contrast(1.1)' }}
-                          />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-white text-base font-semibold">
-                              {editionLabels[key]} Edition
-                            </p>
+                          <p className="text-white text-base font-semibold">
+                            {editionLabels[key]} Edition
+                          </p>
+                          <div className="text-right">
                             <p className="text-gold-300 text-sm font-bold">{ed.kes}</p>
+                            <p className="text-gold-200 font-bold text-lg">{ed.usd}</p>
                           </div>
-                          <span className="font-cinzel text-gold-200 font-bold text-lg whitespace-nowrap">
-                            {ed.usd}
-                          </span>
                         </div>
                       );
                     })}
                     <div
-                      className="flex items-center justify-between rounded-lg px-3 py-3"
+                      className="flex items-center justify-between rounded-lg px-4 py-3"
                       style={{ border: '2px solid #D9A62E', background: 'rgba(217,166,46,0.08)' }}
                     >
                       <div>
