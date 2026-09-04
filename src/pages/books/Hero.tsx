@@ -2,70 +2,123 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, BookOpen } from 'lucide-react';
 import { heroBooks } from './assets';
 
+const glowColors = [
+  'rgba(245,158,11,0.35)',
+  'rgba(59,130,246,0.35)',
+  'rgba(217,166,46,0.35)',
+];
+
+const rotations = ['-4deg', '0deg', '4deg'];
+
+const descriptions = [
+  'Faith-filled devotionals for young hearts.',
+  'Biblical truth for the journey of growing up.',
+  'Daily reflections rooted in Christ and Scripture.',
+];
+
+const collectionLinks = ['/devotionals', '/devotionals', '/devotionals'];
+
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 pb-12">
-      {/* glowing halo behind books */}
+    <section className="relative min-h-screen flex flex-col items-center justify-start overflow-hidden pt-16 pb-12">
+      {/* Background: subtle star particles + radial lighting + vignette */}
       <div
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[60vh] pointer-events-none"
+        className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            'radial-gradient(ellipse 50% 50% at 50% 50%, rgba(217,166,46,0.22) 0%, rgba(59,130,246,0.08) 40%, transparent 70%)',
+            'radial-gradient(ellipse 60% 50% at 50% 30%, rgba(217,166,46,0.06) 0%, transparent 70%)',
+        }}
+        aria-hidden="true"
+      />
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(ellipse 40% 40% at 20% 60%, rgba(245,158,11,0.04) 0%, transparent 60%)',
+        }}
+        aria-hidden="true"
+      />
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(ellipse 40% 40% at 80% 60%, rgba(59,130,246,0.04) 0%, transparent 60%)',
+        }}
+        aria-hidden="true"
+      />
+      {/* Vignette */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(ellipse 100% 100% at 50% 50%, transparent 50%, rgba(5,7,13,0.6) 100%)',
         }}
         aria-hidden="true"
       />
 
-      {/* soft animated light rays */}
-      <div
-        className="absolute left-1/2 top-0 -translate-x-1/2 w-[40vw] h-full pointer-events-none opacity-30"
-        style={{
-          background:
-            'conic-gradient(from 180deg at 50% 0%, transparent 0deg, rgba(217,166,46,0.12) 30deg, transparent 60deg, rgba(59,130,246,0.10) 90deg, transparent 120deg)',
-          animation: 'bk-lantern 18s linear infinite',
-        }}
-        aria-hidden="true"
-      />
-
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        {/* Floating books */}
-        <div className="flex justify-center items-end gap-4 sm:gap-8 lg:gap-14 mb-8 sm:mb-10">
+      {/* Book Showcase */}
+      <div className="relative z-10 w-full max-w-[1300px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div
+          className="flex flex-col md:flex-row items-center justify-center gap-12 md:gap-[60px] lg:gap-[80px] pt-4"
+          style={{ perspective: '1200px' }}
+        >
           {heroBooks.map((book, i) => (
-            <div
+            <Link
               key={book.id}
-              className="bk-float relative"
-              style={{
-                ['--rot' as string]: `${(i - 1) * 4}deg`,
-                animationDelay: `${i * 0.8}s`,
-              }}
+              to={collectionLinks[i]}
+              className="group flex flex-col items-center"
             >
-              <div className="relative rounded-lg shadow-2xl group">
+              {/* Book with glow behind */}
+              <div
+                className="relative transition-all duration-[350ms] ease-out group-hover:-translate-y-3 group-hover:scale-[1.04]"
+                style={{
+                  transform: `rotateY(0deg) rotate(${rotations[i]})`,
+                  transformStyle: 'preserve-3d',
+                }}
+              >
+                {/* Soft radial glow behind book */}
                 <div
-                  className="absolute -inset-1 rounded-lg blur-md opacity-60 -z-10"
-                  style={{ background: book.accent }}
+                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] h-[140%] rounded-full blur-[60px] opacity-60 transition-opacity duration-[350ms] group-hover:opacity-90 pointer-events-none"
+                  style={{ background: `radial-gradient(circle, ${glowColors[i]} 0%, transparent 70%)` }}
                   aria-hidden="true"
                 />
-                <div className="relative rounded-lg overflow-hidden border border-white/10 shadow-xl">
-                  <img
-                    src={book.cover}
-                    alt={`${book.title} devotional cover`}
-                    loading="eager"
-                    className="block w-48 sm:w-72 lg:w-96 h-auto"
-                    style={{ filter: 'brightness(1.2) contrast(1.1)' }}
-                  />
-                  <span className="bk-sweep" />
-                  <div className="absolute inset-x-0 bottom-0 p-2 sm:p-3 bg-gradient-to-t from-black/70 to-transparent">
-                    <p className="font-cinzel text-white text-xs sm:text-sm font-semibold tracking-wide">
-                      {book.title}
-                    </p>
-                    <p className="text-white/60 text-[10px] sm:text-xs">{book.subtitle}</p>
-                  </div>
-                </div>
+                {/* Book cover image — complete, uncropped */}
+                <img
+                  src={book.cover}
+                  alt={`${book.title} devotional cover`}
+                  loading="eager"
+                  className="relative block object-contain shadow-2xl"
+                  style={{
+                    filter: 'brightness(1.15) contrast(1.08)',
+                    width: 'clamp(240px, 28vw, 340px)',
+                    height: 'auto',
+                    maxHeight: '460px',
+                  }}
+                />
               </div>
-            </div>
+
+              {/* Labels underneath */}
+              <div className="mt-6 text-center">
+                <p className="font-cinzel text-xl sm:text-2xl font-bold text-white tracking-wide uppercase">
+                  {book.title}
+                </p>
+                <p className="mt-1 text-[15px] sm:text-base text-[#D0D3D8]/70 tracking-wide">
+                  {book.subtitle}
+                </p>
+                <p className="mt-2 text-sm text-[#D0D3D8]/60 max-w-[280px] leading-[1.5]">
+                  {descriptions[i]}
+                </p>
+                <span className="mt-3 inline-flex items-center gap-1 text-gold-300 font-semibold text-sm group-hover:gap-2 transition-all">
+                  Explore Collection <ArrowRight size={14} />
+                </span>
+              </div>
+            </Link>
           ))}
         </div>
+      </div>
 
-        {/* Headline */}
+      {/* Headline — 70-100px below the book showcase */}
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center mt-[80px]">
         <h1 className="font-cinzel text-4xl sm:text-6xl lg:text-7xl font-extrabold text-white leading-tight tracking-tight">
           One Story.
           <br className="sm:hidden" /> One Saviour.

@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useSEO } from '@/hooks/useSEO';
 import Hero from './books/Hero';
-import AgeCards from './books/AgeCards';
 import CollectionCards from './books/CollectionCards';
 import FeaturesGrid from './books/FeaturesGrid';
 import HowToUse from './books/HowToUse';
@@ -35,7 +34,6 @@ export default function Books() {
     <div className="relative min-h-screen text-white">
       <main>
         <Hero />
-        <AgeCards />
         <CollectionCards />
         <FeaturesGrid />
         <HowToUse />
