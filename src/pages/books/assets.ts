@@ -84,11 +84,11 @@ export const collections: Collection[] = [
     scripture: 'Genesis & Exodus',
     days: 100,
     description: 'Walk through the foundations of Scripture and see the Lamb slain before the foundation of the world.',
-    cover: '/images/books/in_the_begining_he_was_there(adult_version).png',
+    cover: '/images/books/in_the_begining_he_was_there(adult_version) copy 2.png',
     editions: {
-      kids: { cover: '/images/books/in_the_begining_he_was_there(kids_version).png', usd: '$8', kes: 'KES 1,080' },
-      teen: { cover: '/images/books/in_the_begining_he_was_there(teen_version).png', usd: '$10', kes: 'KES 1,350' },
-      adult: { cover: '/images/books/in_the_begining_he_was_there(adult_version).png', usd: '$12', kes: 'KES 1,600' },
+      kids: { cover: '/images/books/in_the_begining_he_was_there(kids_version) copy 2.png', usd: '$8', kes: 'KES 1,080' },
+      teen: { cover: '/images/books/in_the_begining_he_was_there(teen_version) copy 2.png', usd: '$10', kes: 'KES 1,350' },
+      adult: { cover: '/images/books/in_the_begining_he_was_there(adult_version) copy 2.png', usd: '$12', kes: 'KES 1,600' },
     },
   },
   {
