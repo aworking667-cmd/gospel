@@ -140,11 +140,11 @@ export const collections: Collection[] = [
     scripture: 'The Prophet Like Moses',
     days: 120,
     description: 'Listen to the sermons of Moses and hear the heartbeat of the Prophet who would one day stand on the mountain.',
-    cover: '/images/books/he_spoke_before_he_came(adult_version).png',
+    cover: '/images/books/he_spoke_before_he_came(adult_version) copy 2.png',
     editions: {
-      kids: { cover: '/images/books/he_spoke_before_he_came(kids_version).png', usd: '$8', kes: 'KES 1,080' },
-      teen: { cover: '/images/books/he_spoke_before_he_came(teen_version).png', usd: '$10', kes: 'KES 1,350' },
-      adult: { cover: '/images/books/he_spoke_before_he_came(adult_version).png', usd: '$12', kes: 'KES 1,600' },
+      kids: { cover: '/images/books/he_spoke_before_he_came(kids_version) copy 2.png', usd: '$8', kes: 'KES 1,080' },
+      teen: { cover: '/images/books/he_spoke_before_he_came(teen_version) copy 2.png', usd: '$10', kes: 'KES 1,350' },
+      adult: { cover: '/images/books/he_spoke_before_he_came(adult_version) copy 2.png', usd: '$12', kes: 'KES 1,600' },
     },
   },
 ];
