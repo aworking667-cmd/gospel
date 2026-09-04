@@ -87,12 +87,10 @@ export default function Hero() {
                   src={book.cover}
                   alt={`${book.title} devotional cover`}
                   loading="eager"
-                  className="relative block object-contain shadow-2xl"
+                  className="relative block h-auto w-full object-contain shadow-2xl"
                   style={{
                     filter: 'brightness(1.15) contrast(1.08)',
-                    width: 'clamp(240px, 28vw, 340px)',
-                    height: 'auto',
-                    maxHeight: '460px',
+                    maxWidth: 'clamp(240px, 28vw, 340px)',
                   }}
                 />
               </div>

@@ -33,7 +33,7 @@ export default function CollectionCards() {
                 style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid #3A3A35' }}
               >
                 {/* Three full edition covers side by side */}
-                <div className="relative w-full bg-white/[0.03] border-b border-white/5 overflow-hidden">
+                <div className="relative w-full bg-white/[0.03] border-b border-white/5">
                   <div className="flex items-stretch justify-center gap-2 sm:gap-3 p-4">
                     {editionOrder.map((key) => {
                       const ed = c.editions[key];

@@ -41,7 +41,7 @@ export default function FinalCTA() {
                 src={book.cover}
                 alt={book.title}
                 loading="lazy"
-                className="block w-32 sm:w-48 lg:w-64 h-auto rounded-lg border border-white/10 shadow-2xl"
+                className="block w-32 sm:w-48 lg:w-64 h-auto object-contain rounded-lg border border-white/10 shadow-2xl"
                 style={{ filter: 'brightness(1.2) contrast(1.1)' }}
               />
             </div>

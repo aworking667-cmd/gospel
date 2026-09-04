@@ -20,7 +20,7 @@ export const heroBooks: BookCover[] = [
     subtitle: 'Ages 6–12',
     age: 'Kids',
     accent: '#F59E0B',
-    cover: '/images/books/he_was_always_the_answer(kids_edition).png',
+    cover: '/images/books/he_was_always_the_answer(kids_version).png',
   },
   {
     id: 'teen',
@@ -28,7 +28,7 @@ export const heroBooks: BookCover[] = [
     subtitle: 'Ages 13–18',
     age: 'Teen',
     accent: '#3B82F6',
-    cover: '/images/books/he_was_always_the_answer(teen_edition).png',
+    cover: '/images/books/he_was_always_the_answer(teen_version).png',
   },
   {
     id: 'adult',
@@ -36,7 +36,7 @@ export const heroBooks: BookCover[] = [
     subtitle: 'Ages 19+',
     age: 'Adult',
     accent: '#D4AF37',
-    cover: '/images/books/he_was_always_the_answer(adult_edition).png',
+    cover: '/images/books/he_was_always_the_answer(adult_version).png',
   },
 ];
 
@@ -70,11 +70,11 @@ export const collections: Collection[] = [
     scripture: 'Meeting Jesus throughout Scripture',
     days: 120,
     description: 'A 120-day journey tracing the promise of a Saviour from Genesis to Revelation, revealing Christ on every page.',
-    cover: '/images/books/he_was_always_the_answer(adult_edition).png',
+    cover: '/images/books/he_was_always_the_answer(adult_version).png',
     editions: {
-      kids: { cover: '/images/books/he_was_always_the_answer(kids_edition).png', usd: '$8', kes: 'KES 1,080' },
-      teen: { cover: '/images/books/he_was_always_the_answer(teen_edition).png', usd: '$10', kes: 'KES 1,350' },
-      adult: { cover: '/images/books/he_was_always_the_answer(adult_edition).png', usd: '$12', kes: 'KES 1,600' },
+      kids: { cover: '/images/books/he_was_always_the_answer(kids_version).png', usd: '$8', kes: 'KES 1,080' },
+      teen: { cover: '/images/books/he_was_always_the_answer(teen_version).png', usd: '$10', kes: 'KES 1,350' },
+      adult: { cover: '/images/books/he_was_always_the_answer(adult_version).png', usd: '$12', kes: 'KES 1,600' },
     },
   },
   {
@@ -112,11 +112,11 @@ export const collections: Collection[] = [
     scripture: 'The Songbook of the King',
     days: 82,
     description: 'Hear the voice of the Shepherd-King in every psalm, from the cross-shaped cries of David to the praises of Zion.',
-    cover: '/images/books/he_sang_about_himself(adult_edition).png',
+    cover: '/images/books/he_sang_about_himself(adult_version).png',
     editions: {
-      kids: { cover: '/images/books/he_sang_about_himself(kids_edition).png', usd: '$8', kes: 'KES 1,080' },
-      teen: { cover: '/images/books/he_sang_about_himself(teen_edition).png', usd: '$10', kes: 'KES 1,350' },
-      adult: { cover: '/images/books/he_sang_about_himself(adult_edition).png', usd: '$12', kes: 'KES 1,600' },
+      kids: { cover: '/images/books/he_sang_about_himself_(kids_version).png', usd: '$8', kes: 'KES 1,080' },
+      teen: { cover: '/images/books/he_sang_about_himself(teen_version).png', usd: '$10', kes: 'KES 1,350' },
+      adult: { cover: '/images/books/he_sang_about_himself(adult_version).png', usd: '$12', kes: 'KES 1,600' },
     },
   },
   {
@@ -126,11 +126,11 @@ export const collections: Collection[] = [
     scripture: 'The Gospels & Beyond',
     days: 120,
     description: 'See how the Old Testament promises burst into living colour the moment the Word becomes flesh.',
-    cover: '/images/books/every_where_i_look_its_him(adult_edition).png',
+    cover: '/images/books/everywhere_i_look_its_him(adult_version).png',
     editions: {
-      kids: { cover: '/images/books/everywhere_i_look_its_him(kids_edition).png', usd: '$8', kes: 'KES 1,080' },
-      teen: { cover: '/images/books/everywhere_i_look_its_him(teen_edition).png', usd: '$10', kes: 'KES 1,350' },
-      adult: { cover: '/images/books/every_where_i_look_its_him(adult_edition).png', usd: '$12', kes: 'KES 1,600' },
+      kids: { cover: '/images/books/everywhere_i_look_its_him(kids_version).png', usd: '$8', kes: 'KES 1,080' },
+      teen: { cover: '/images/books/everywhere_i_look_its_him(teen_version).png', usd: '$10', kes: 'KES 1,350' },
+      adult: { cover: '/images/books/everywhere_i_look_its_him(adult_version).png', usd: '$12', kes: 'KES 1,600' },
     },
   },
   {
@@ -163,21 +163,21 @@ export const ageCards: AgeCard[] = [
     age: 'Kids',
     range: 'Age 6–12',
     features: ['Bright illustrations', 'Simple explanations', 'Fun activities', 'Family discussion'],
-    cover: '/images/books/he_was_always_the_answer(kids_edition).png',
+    cover: '/images/books/he_was_always_the_answer(kids_version).png',
   },
   {
     id: 'teen-card',
     age: 'Teen',
     range: 'Age 13–18',
     features: ['Faith in today\'s world', 'Reflection', 'Questions', 'Life application'],
-    cover: '/images/books/he_was_always_the_answer(teen_edition).png',
+    cover: '/images/books/he_was_always_the_answer(teen_version).png',
   },
   {
     id: 'adult-card',
     age: 'Adult',
     range: 'Age 19+',
     features: ['Rich theology', 'Prayer', 'Daily transformation', 'Church study'],
-    cover: '/images/books/he_was_always_the_answer(adult_edition).png',
+    cover: '/images/books/he_was_always_the_answer(adult_version).png',
   },
 ];
 
