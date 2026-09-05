@@ -246,6 +246,22 @@ export async function sendAdminEmailWithAttachments(payload: {
   return result;
 }
 
+/* ─── blog cover image upload ─────────────────────────────────── */
+
+export async function uploadBlogCoverImage(file: File): Promise<string> {
+  const supabase = getSupabaseClient();
+  const ext = file.name.split('.').pop() ?? 'png';
+  const filePath = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+  const { error } = await supabase.storage
+    .from('blog-images')
+    .upload(filePath, file, { cacheControl: '3600', upsert: false });
+  if (error) throw error;
+  const { data: pubData } = supabase.storage
+    .from('blog-images')
+    .getPublicUrl(filePath);
+  return pubData.publicUrl;
+}
+
 /* ─── admin comment moderation helpers ──────────────────────── */
 
 export type AdminComment = {

@@ -1,6 +1,6 @@
-import { useEffect, useState, useCallback } from 'react';
-import { getSupabaseClient } from '@/lib/supabase';
-import { Plus, Pencil, Trash2, Eye, EyeOff, X, Save, RefreshCw, AlertCircle } from 'lucide-react';
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { getSupabaseClient, uploadBlogCoverImage } from '@/lib/supabase';
+import { Plus, Pencil, Trash2, Eye, EyeOff, X, Save, RefreshCw, AlertCircle, Upload, Link2, ImagePlus } from 'lucide-react';
 
 type BlogPost = {
   id: string;
@@ -65,6 +65,10 @@ export default function BlogAdmin() {
   const [editing, setEditing] = useState<EditState | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
+  const [imageMode, setImageMode] = useState<'upload' | 'url'>('upload');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -89,6 +93,8 @@ export default function BlogAdmin() {
   function startNew() {
     setEditing({ ...EMPTY });
     setSaveError('');
+    setUploadError('');
+    setImageMode('upload');
   }
 
   function startEdit(post: BlogPost) {
@@ -105,6 +111,8 @@ export default function BlogAdmin() {
       status: (post.status as 'draft' | 'published') ?? 'draft',
     });
     setSaveError('');
+    setUploadError('');
+    setImageMode(post.cover_image_url ? 'url' : 'upload');
   }
 
   async function save() {
@@ -359,16 +367,102 @@ export default function BlogAdmin() {
                 />
               </div>
 
-              {/* Cover image URL */}
+              {/* Cover image — upload or URL */}
               <div>
-                <label className="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-1.5">Cover Image URL</label>
-                <input
-                  type="url"
-                  value={editing.cover_image_url}
-                  onChange={(e) => setEditing({ ...editing, cover_image_url: e.target.value })}
-                  className="ih-input w-full px-4 py-2.5 text-sm"
-                  placeholder="https://images.pexels.com/..."
-                />
+                <label className="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-1.5">Cover Image</label>
+
+                {/* Preview */}
+                {editing.cover_image_url && (
+                  <div className="relative mb-3 rounded-xl overflow-hidden border border-white/10 bg-white/5">
+                    <img src={editing.cover_image_url} alt="Cover preview" className="w-full max-h-56 object-cover" />
+                    <button
+                      onClick={() => setEditing({ ...editing, cover_image_url: '' })}
+                      className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/60 hover:bg-black/80 text-white/80 hover:text-white transition-colors"
+                      title="Remove cover"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                )}
+
+                {/* Mode toggle */}
+                {!editing.cover_image_url && (
+                  <div className="flex gap-2 mb-3">
+                    <button
+                      onClick={() => setImageMode('upload')}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                        imageMode === 'upload' ? 'bg-gold-500/20 text-gold-300 border border-gold-400/40' : 'bg-white/5 text-white/50 border border-white/10 hover:text-white'
+                      }`}
+                    >
+                      <Upload size={12} /> Upload
+                    </button>
+                    <button
+                      onClick={() => setImageMode('url')}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                        imageMode === 'url' ? 'bg-gold-500/20 text-gold-300 border border-gold-400/40' : 'bg-white/5 text-white/50 border border-white/10 hover:text-white'
+                      }`}
+                    >
+                      <Link2 size={12} /> URL
+                    </button>
+                  </div>
+                )}
+
+                {/* Upload mode */}
+                {imageMode === 'upload' && !editing.cover_image_url && (
+                  <div>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp,image/gif"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        if (file.size > 5 * 1024 * 1024) {
+                          setUploadError('Image must be under 5 MB.');
+                          return;
+                        }
+                        setUploading(true);
+                        setUploadError('');
+                        try {
+                          const url = await uploadBlogCoverImage(file);
+                          setEditing({ ...editing, cover_image_url: url });
+                        } catch {
+                          setUploadError('Upload failed. Please try again.');
+                        } finally {
+                          setUploading(false);
+                          if (fileInputRef.current) fileInputRef.current.value = '';
+                        }
+                      }}
+                    />
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                      className="w-full flex flex-col items-center justify-center gap-2 py-8 rounded-xl border-2 border-dashed border-white/15 hover:border-gold-400/40 bg-white/[0.02] hover:bg-white/[0.04] transition-colors group"
+                    >
+                      {uploading ? (
+                        <><RefreshCw size={24} className="animate-spin text-gold-400" />
+                        <span className="text-sm text-white/50">Uploading...</span></>
+                      ) : (
+                        <><ImagePlus size={24} className="text-white/30 group-hover:text-gold-400/60 transition-colors" />
+                        <span className="text-sm text-white/40">Click to upload a cover photo</span>
+                        <span className="text-xs text-white/25">PNG, JPG, WebP — max 5 MB</span></>
+                      )}
+                    </button>
+                    {uploadError && <p className="text-xs text-red-300 mt-2">{uploadError}</p>}
+                  </div>
+                )}
+
+                {/* URL mode */}
+                {imageMode === 'url' && !editing.cover_image_url && (
+                  <input
+                    type="url"
+                    value={editing.cover_image_url}
+                    onChange={(e) => setEditing({ ...editing, cover_image_url: e.target.value })}
+                    className="ih-input w-full px-4 py-2.5 text-sm"
+                    placeholder="https://images.pexels.com/..."
+                  />
+                )}
               </div>
 
               {/* Author + Category */}
